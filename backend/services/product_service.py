@@ -41,7 +41,6 @@ def create_product(product):
 
 def get_products(category=None):
 
-    print("CATEGORY RECEIVED:", category)
 
     product_collection = db["products"]
 
@@ -55,15 +54,13 @@ def get_products(category=None):
             "name": category
         })
 
-        print("CATEGORY FOUND:", category_data)
 
         if not category_data:
-            print("CATEGORY NOT FOUND")
             return []
 
         categoryUuid = category_data["categoryUuid"]
 
-        print("CATEGORY UUID:", categoryUuid)
+       
 
         query["categoryUuid"] = categoryUuid
 
