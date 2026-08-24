@@ -14,7 +14,7 @@ def get_dashboard_stats():
 
     total_orders = order_collection.count_documents({})
 
-    total_users =  order_collection.count_documents({})
+    total_users =  user_collection.count_documents({})
 
     orders = order_collection.find({})
 

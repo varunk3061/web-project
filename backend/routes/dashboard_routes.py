@@ -8,9 +8,7 @@ router = APIRouter()
 
 
 @router.get("/admin/dashboard")
-def dashboard(
-    current_admin=Depends(get_current_admin)
-):
+def dashboard(current_admin=Depends(get_current_admin)):
 
     stats = get_dashboard_stats()
 

@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Flipkart Clone",
-  description: "Flipkart Clone",
+  title: "Aurabazzer",
+  description: "Online platform",
 };
 
 export default function RootLayout({ children }) {

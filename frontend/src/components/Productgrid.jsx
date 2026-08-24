@@ -28,14 +28,23 @@ export default function ProductGrid(){
 
   return (
 
-    <section className="py-12">
+    <section className="bg-gray-50 py-14">
 
       <div className="mx-auto max-w-7xl px-6">
 
 
-        <h2 className="mb-8 text-3xl font-bold">
-          Featured Products
-        </h2>
+        <div className="mb-8 flex items-end justify-between">
+
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Products
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Handpicked items just for you
+            </p>
+          </div>
+
+        </div>
 
 
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">

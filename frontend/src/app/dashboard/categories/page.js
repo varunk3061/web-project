@@ -212,7 +212,7 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
 
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
@@ -222,35 +222,39 @@ export default function CategoriesPage() {
             Categories
           </h1>
 
-          <p className="mt-2 text-gray-500">
+          <p className="mt-1 text-gray-500">
             Manage your product categories
           </p>
         </div>
 
-        <div className="rounded-lg bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600">
-          {categories.length} Categories
+        <div className="rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600">
+          {categories.length} {categories.length === 1 ? "Category" : "Categories"}
         </div>
 
       </div>
 
       {/* Add / Edit Form */}
-      <div className="mb-8 rounded-xl border bg-white p-6 shadow-sm">
+      <div className="mb-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
 
         <div className="mb-5 flex items-center gap-2">
 
           {editingCategory ? (
             <>
-              <Pencil size={20} className="text-blue-600" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50">
+                <Pencil size={18} className="text-blue-600" />
+              </div>
 
-              <h2 className="text-lg font-semibold">
+              <h2 className="text-lg font-semibold text-gray-900">
                 Edit Category
               </h2>
             </>
           ) : (
             <>
-              <Plus size={20} className="text-blue-600" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50">
+                <Plus size={18} className="text-blue-600" />
+              </div>
 
-              <h2 className="text-lg font-semibold">
+              <h2 className="text-lg font-semibold text-gray-900">
                 Add Category
               </h2>
             </>
@@ -272,13 +276,13 @@ export default function CategoriesPage() {
             placeholder="Enter category name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="flex-1 rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
           />
 
           <button
             type="submit"
             disabled={saving}
-            className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {saving
               ? "Saving..."
@@ -291,7 +295,7 @@ export default function CategoriesPage() {
             <button
               type="button"
               onClick={handleCancelEdit}
-              className="flex items-center justify-center gap-2 rounded-lg border px-5 py-3 font-medium text-gray-600 transition hover:bg-gray-100"
+              className="flex items-center justify-center gap-2 rounded-xl border border-gray-300 px-5 py-3 font-medium text-gray-600 transition hover:bg-gray-100"
             >
               <X size={18} />
               Cancel
@@ -309,9 +313,9 @@ export default function CategoriesPage() {
       </div>
 
       {/* Categories Table */}
-      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
 
-        <div className="border-b px-6 py-5">
+        <div className="border-b border-gray-100 px-6 py-5">
 
           <h2 className="font-semibold text-gray-900">
             All Categories
@@ -320,11 +324,12 @@ export default function CategoriesPage() {
         </div>
 
         {loading ? (
-          <div className="p-10 text-center text-gray-500">
+          <div className="flex flex-col items-center gap-3 p-14 text-center text-gray-500">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
             Loading categories...
           </div>
         ) : categories.length === 0 ? (
-          <div className="p-10 text-center text-gray-500">
+          <div className="p-14 text-center text-gray-500">
             No categories found.
           </div>
         ) : (
@@ -335,22 +340,22 @@ export default function CategoriesPage() {
               <thead className="bg-gray-50">
 
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Category
                   </th>
 
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Created At
                   </th>
 
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">
+                  <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Actions
                   </th>
                 </tr>
 
               </thead>
 
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-gray-100">
 
                 {categories.map((category) => (
 

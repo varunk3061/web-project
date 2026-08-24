@@ -28,7 +28,7 @@ def get_current_user(credentials= Depends(oauth2_scheme)): #Depends(oauth2_schem
             algorithms=[ALGORITHM]
         )
 
-        return payload #after decoding the token, it returns the payload data which contains user_id and email. This payload data is used in the profile route to get the current user's information. The frontend sends the JWT token in the request header, and this function decodes it to get the user's information
+        return payload #after decoding the token, it returns the payload data which contains userUuid and email. This payload data is used in the profile route to get the current user's information. The frontend sends the JWT token in the request header, and this function decodes it to get the user's information
 
 
     except JWTError:

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
 
 export default function Cart() {
   const router = useRouter();
@@ -164,9 +165,12 @@ export default function Cart() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-gray-500">
-          Loading cart...
-        </p>
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-9 w-9 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+          <p className="text-sm text-gray-500">
+            Loading cart...
+          </p>
+        </div>
       </div>
     );
   }
@@ -182,7 +186,7 @@ export default function Cart() {
 
         <div className="text-center">
 
-          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 text-4xl">
+          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-blue-50 text-4xl">
             🛒
           </div>
 
@@ -196,8 +200,9 @@ export default function Cart() {
 
           <Link
             href="/"
-            className="mt-6 inline-block rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 active:scale-[0.98]"
           >
+            <ShoppingBag size={18} />
             Continue Shopping
           </Link>
 
@@ -267,7 +272,7 @@ export default function Cart() {
                 key={
                   `${item.productUuid}-${item.variantUuid || "default"}`
                 }
-                className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md"
               >
 
                 <div className="flex gap-5">
@@ -275,7 +280,7 @@ export default function Cart() {
 
                   {/* IMAGE */}
 
-                  <div className="relative h-32 w-32 shrink-0 rounded-xl bg-gray-50">
+                  <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-xl bg-gray-50">
 
                     {item.imageUrls ? (
 
@@ -289,7 +294,7 @@ export default function Cart() {
 
                     ) : (
 
-                      <div className="flex h-full items-center justify-center text-gray-400">
+                      <div className="flex h-full items-center justify-center text-sm text-gray-400">
                         No image
                       </div>
 
@@ -308,7 +313,7 @@ export default function Cart() {
 
                         <Link
                           href={`/products/${item.productUuid}`}
-                          className="text-lg font-semibold text-gray-900 hover:text-blue-600"
+                          className="text-lg font-semibold text-gray-900 transition hover:text-blue-600"
                         >
                           {item.title}
                         </Link>
@@ -321,7 +326,7 @@ export default function Cart() {
                             item.attributes
                           ).length > 0 && (
 
-                            <div className="mt-2 space-y-1">
+                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
 
                               {Object.entries(
                                 item.attributes
@@ -332,7 +337,7 @@ export default function Cart() {
                                     key={key}
                                     className="text-sm text-gray-500"
                                   >
-                                    <span className="font-medium capitalize">
+                                    <span className="font-medium capitalize text-gray-600">
                                       {key}:
                                     </span>{" "}
                                     {value}
@@ -366,8 +371,9 @@ export default function Cart() {
                             item.variantUuid
                           )
                         }
-                        className="text-sm font-medium text-red-500 hover:text-red-700"
+                        className="flex h-fit shrink-0 items-center gap-1.5 rounded-lg border border-transparent px-2.5 py-1.5 text-sm font-medium text-red-500 transition hover:border-red-100 hover:bg-red-50 hover:text-red-700"
                       >
+                        <Trash2 size={15} />
                         Remove
                       </button>
 
@@ -382,7 +388,7 @@ export default function Cart() {
                         Quantity
                       </span>
 
-                      <div className="flex items-center rounded-lg border border-gray-300">
+                      <div className="flex items-center overflow-hidden rounded-lg border border-gray-300 bg-gray-50">
 
                         {/* MINUS */}
 
@@ -397,15 +403,15 @@ export default function Cart() {
                           disabled={
                             item.quantity === 1
                           }
-                          className="px-3 py-1.5 text-lg hover:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-300"
+                          className="flex h-9 w-9 items-center justify-center text-gray-600 transition hover:bg-white active:scale-95 disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-transparent"
                         >
-                          −
+                          <Minus size={15} />
                         </button>
 
 
                         {/* CURRENT QUANTITY */}
 
-                        <span className="min-w-10 text-center font-semibold">
+                        <span className="min-w-10 bg-white text-center font-semibold text-gray-900">
                           {item.quantity}
                         </span>
 
@@ -420,9 +426,9 @@ export default function Cart() {
                               item.quantity + 1
                             )
                           }
-                          className="px-3 py-1.5 text-lg hover:bg-gray-100"
+                          className="flex h-9 w-9 items-center justify-center text-gray-600 transition hover:bg-white active:scale-95"
                         >
-                          +
+                          <Plus size={15} />
                         </button>
 
                       </div>
@@ -442,7 +448,7 @@ export default function Cart() {
 
           {/* ================= SUMMARY ================= */}
 
-          <div className="h-fit rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="h-fit rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
 
             <h2 className="text-xl font-bold text-gray-900">
               Order Summary
@@ -504,9 +510,10 @@ export default function Cart() {
 
             <Link
               href="/checkout"
-              className="mt-6 block w-full rounded-xl bg-blue-600 py-3 text-center font-semibold text-white hover:bg-blue-700"
+              className="group mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-center font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 active:scale-[0.99]"
             >
               Proceed to Checkout
+              <ArrowRight size={18} className="transition group-hover:translate-x-1" />
             </Link>
 
 

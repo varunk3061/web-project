@@ -36,7 +36,7 @@ def add_product(
 
 # @router.get("/products")
 # def read_products():
-#     products = get_products()
+#     products = get_products()l
 #     return products
 
 @router.get("/products")

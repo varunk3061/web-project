@@ -3,6 +3,9 @@ from uuid import uuid4
 from datetime import datetime
 from bson import ObjectId
 
+def generate_order_number():
+    return f"ORD-{str(uuid4())[:8].upper()}"
+
 
 def create_order(user_id, shipping_address, productUuid=None, quantity=None):
 
@@ -109,6 +112,7 @@ def create_order(user_id, shipping_address, productUuid=None, quantity=None):
     order = {
         "orderUuid": str(uuid4()),
         "userId": user_id,
+        "orderNumber": generate_order_number(),
         "items": order_items,
         "totalAmount": total_amount,
         "shippingAddress": shipping_address,
@@ -154,7 +158,7 @@ def create_order(user_id, shipping_address, productUuid=None, quantity=None):
 
     return {
         "message": "Order placed successfully",
-        "orderUuid": order["orderUuid"],
+        "orderNumber": order["orderNumber"],
         "totalAmount": total_amount
     }
 
@@ -189,6 +193,7 @@ def get_orders(user_id):
 
         result.append({
             "orderUuid": order["orderUuid"],
+            "orderNumber": order.get("orderNumber"),
             "items": [
                 {
                     "productUuid": item["productUuid"],
@@ -225,6 +230,7 @@ def get_all_orders():
 
         result.append({
             "orderUuid": order["orderUuid"],
+            "orderNumber": order.get("orderNumber"),
             "customer": {
                 "name": user["name"] if user else "Unknown",
                 "email": user["email"] if user else "Unknown"

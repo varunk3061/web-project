@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -48,7 +47,7 @@ export default function SignupForm() {
   return (
     <div className="w-full max-w-md">
 
-      <h1 className="text-4xl font-bold text-gray-800">
+      <h1 className="text-4xl font-bold text-gray-900">
         Create Account
       </h1>
 
@@ -63,52 +62,52 @@ export default function SignupForm() {
 
         {/* Name */}
         <div>
-          <label className="mb-2 block font-medium">
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
             Full Name
           </label>
 
           <input
             type="text"
-            value={name}
+            value={name} required
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter your full name"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
+            className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
           />
         </div>
 
         {/* Email */}
         <div>
-          <label className="mb-2 block font-medium">
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
             Email
           </label>
 
           <input
             type="email"
-            value={email}
+            value={email} required
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
+            className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
           />
         </div>
 
         {/* Password */}
         <div>
-          <label className="mb-2 block font-medium">
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
             Password
           </label>
 
           <input
             type="password"
-            value={password}
+            value={password} required
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
+            className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
           />
         </div>
 
         {/* Confirm Password */}
         <div>
-          <label className="mb-2 block font-medium">
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
             Confirm Password
           </label>
 
@@ -117,14 +116,20 @@ export default function SignupForm() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Confirm password"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
+            className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
           />
+
+          {confirmPassword && password !== confirmPassword && (
+            <p className="mt-1.5 text-xs text-red-600">
+              Passwords do not match
+            </p>
+          )}
         </div>
 
         {/* Signup Button */}
         <button
           type="submit"
-          className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700"
+          className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 active:scale-[0.99]"
         >
           Create Account
         </button>

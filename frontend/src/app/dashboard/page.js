@@ -73,11 +73,30 @@ export default function DashboardPage() {
     fetchRecentOrders();
   }, []);
 
+  // Purely presentational helper - maps a status string to badge classes.
+  // Does not touch stats/recentOrders state or the fetch logic above.
+  function getStatusStyles(status) {
+    switch ((status || "").toLowerCase()) {
+      case "delivered":
+      case "completed":
+        return "bg-green-100 text-green-700";
+      case "pending":
+        return "bg-yellow-100 text-yellow-700";
+      case "cancelled":
+      case "failed":
+        return "bg-red-100 text-red-700";
+      case "shipped":
+        return "bg-purple-100 text-purple-700";
+      default:
+        return "bg-blue-100 text-blue-700";
+    }
+  }
+
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
 
       {/* Dashboard Heading */}
-      <h1 className="mb-2 text-2xl font-bold">
+      <h1 className="mb-1 text-2xl font-bold text-gray-900">
         Dashboard
       </h1>
 
@@ -90,19 +109,21 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
 
         {/* Total Orders */}
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:shadow-md">
 
           <div className="flex items-center justify-between">
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm font-medium text-gray-500">
               Total Orders
             </p>
 
-            <ShoppingCart className="h-6 w-6 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+              <ShoppingCart className="h-5 w-5 text-blue-600" />
+            </div>
 
           </div>
 
-          <h2 className="mt-2 text-3xl font-bold">
+          <h2 className="mt-3 text-3xl font-bold text-gray-900">
             {stats.totalOrders}
           </h2>
 
@@ -110,19 +131,21 @@ export default function DashboardPage() {
 
 
         {/* Total Products */}
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:shadow-md">
 
           <div className="flex items-center justify-between">
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm font-medium text-gray-500">
               Total Products
             </p>
 
-            <Package className="h-6 w-6 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50">
+              <Package className="h-5 w-5 text-indigo-600" />
+            </div>
 
           </div>
 
-          <h2 className="mt-2 text-3xl font-bold">
+          <h2 className="mt-3 text-3xl font-bold text-gray-900">
             {stats.totalProducts}
           </h2>
 
@@ -130,19 +153,21 @@ export default function DashboardPage() {
 
 
         {/* Total Categories */}
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:shadow-md">
 
           <div className="flex items-center justify-between">
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm font-medium text-gray-500">
               Total Categories
             </p>
 
-            <Tags className="h-6 w-6 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50">
+              <Tags className="h-5 w-5 text-amber-600" />
+            </div>
 
           </div>
 
-          <h2 className="mt-2 text-3xl font-bold">
+          <h2 className="mt-3 text-3xl font-bold text-gray-900">
             {stats.totalCategories}
           </h2>
 
@@ -150,19 +175,21 @@ export default function DashboardPage() {
 
 
         {/* Total Users */}
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:shadow-md">
 
           <div className="flex items-center justify-between">
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm font-medium text-gray-500">
               Total Users
             </p>
 
-            <Users className="h-6 w-6 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50">
+              <Users className="h-5 w-5 text-green-600" />
+            </div>
 
           </div>
 
-          <h2 className="mt-2 text-3xl font-bold">
+          <h2 className="mt-3 text-3xl font-bold text-gray-900">
             {stats.totalUsers}
           </h2>
 
@@ -173,18 +200,22 @@ export default function DashboardPage() {
 
       {/* ================= RECENT ORDERS ================= */}
 
-      <div className="mt-8 rounded-xl border bg-white shadow-sm">
+      <div className="mt-8 rounded-2xl border border-gray-100 bg-white shadow-sm">
 
         {/* Section Header */}
-        <div className="border-b p-6">
+        <div className="flex items-center justify-between border-b border-gray-100 p-6">
 
-          <h2 className="text-xl font-semibold">
-            Recent Orders
-          </h2>
+          <div>
 
-          <p className="text-sm text-gray-500">
-            Latest orders placed by customers
-          </p>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Recent Orders
+            </h2>
+
+            <p className="text-sm text-gray-500">
+              Latest orders placed by customers
+            </p>
+
+          </div>
 
         </div>
 
@@ -199,19 +230,19 @@ export default function DashboardPage() {
 
               <tr>
 
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Order ID
                 </th>
 
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Customer
                 </th>
 
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Amount
                 </th>
 
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Status
                 </th>
 
@@ -229,7 +260,7 @@ export default function DashboardPage() {
 
                   <td
                     colSpan="4"
-                    className="px-6 py-8 text-center text-gray-500"
+                    className="px-6 py-10 text-center text-gray-500"
                   >
                     No orders found
                   </td>
@@ -242,19 +273,19 @@ export default function DashboardPage() {
 
                   <tr
                     key={order.orderUuid}
-                    className="border-t"
+                    className="border-t border-gray-100 transition hover:bg-gray-50"
                   >
 
                     {/* Order ID */}
-                    <td className="px-6 py-4 text-sm font-medium">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
 
-                      {order.orderUuid}
+                      {order.orderNumber}
 
                     </td>
 
 
                     {/* Customer */}
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-6 py-4 text-sm text-gray-600">
 
                       {order.customer?.name || "Unknown"}
 
@@ -262,7 +293,7 @@ export default function DashboardPage() {
 
 
                     {/* Amount */}
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
 
                       ₹
                       {order.totalAmount?.toLocaleString("en-IN")}
@@ -273,7 +304,7 @@ export default function DashboardPage() {
                     {/* Status */}
                     <td className="px-6 py-4">
 
-                      <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold capitalize text-blue-700">
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${getStatusStyles(order.status)}`}>
 
                         {order.status}
 

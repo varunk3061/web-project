@@ -1,40 +1,35 @@
-import Image from "next/image";
-
 export default function AuthLayout({ children }) {
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen">
 
       {/* Left Side hidden kele karn size jar small zali tar left side hide honar*/}
-      <div className="hidden w-1/2 items-center justify-center bg-blue-300 p-10 md:flex">
+      <div className="relative hidden w-1/2 items-center justify-center overflow-hidden bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 p-10 md:flex">
 
-        <div className="text-center text-white">
+        {/* decorative shapes */}
+        <div className="pointer-events-none absolute -left-16 -top-16 h-72 w-72 rounded-full bg-white/10 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-24 -right-10 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute right-10 top-1/4 h-24 w-24 rotate-12 rounded-2xl border border-white/20" />
+        <div className="pointer-events-none absolute bottom-1/4 left-10 h-16 w-16 -rotate-12 rounded-xl border border-white/20" />
 
-          <Image
-            src="/logo.png"
-            alt="Flipkart Logo"
-            width={180}
-            height={60}
-            className="mx-auto mb-8"
-          />
-
+        <div className="relative z-10 text-center text-white">
 
           <h1 className="text-4xl font-bold">
             Shop Smarter
           </h1>
 
 
-          <p className="mt-4 text-lg text-blue-100">
+          <p className="mx-auto mt-4 max-w-xs text-lg text-blue-100">
             Discover amazing products at the best prices.
           </p>
 
 
-          <Image
-            src="/Logo.png"
-            alt="Shopping Illustration"
-            width={350}
-            height={350}
-            className="mx-auto mt-10"
-          />
+          <div className="mx-auto mt-12 flex max-w-sm items-center justify-center gap-3">
+
+            <div className="h-24 w-16 rounded-xl bg-white/15 backdrop-blur-sm" />
+            <div className="h-32 w-20 rounded-xl bg-white/25 backdrop-blur-sm" />
+            <div className="h-24 w-16 rounded-xl bg-white/15 backdrop-blur-sm" />
+
+          </div>
 
         </div>
 
@@ -52,4 +47,3 @@ export default function AuthLayout({ children }) {
     </div>
   );
 }
-

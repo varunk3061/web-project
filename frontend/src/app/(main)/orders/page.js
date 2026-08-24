@@ -108,7 +108,7 @@ export default function OrdersPage() {
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-500">
-                  Order ID: {order.orderUuid}
+                  Order ID: {order.orderNumber}
                 </p>
               </div>
 

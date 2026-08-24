@@ -39,7 +39,14 @@ export default function OrdersPage() {
   }, []);
 
   if (loading) {
-    return <p className="p-6">Loading orders...</p>;
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-9 w-9 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+          <p className="text-sm text-gray-500">Loading orders...</p>
+        </div>
+      </div>
+    );
   }
 
   const updateOrderStatus = async (orderUuid, newStatus) => {
@@ -83,119 +90,156 @@ export default function OrdersPage() {
   }
 };
 
+  // Purely presentational helper - maps a status string to select-box
+  // colors. Does not touch orders state or updateOrderStatus above.
+  function getStatusClasses(status) {
+    switch (status) {
+      case "delivered":
+        return "border-green-200 bg-green-50 text-green-700";
+      case "shipped":
+        return "border-purple-200 bg-purple-50 text-purple-700";
+      default:
+        return "border-yellow-200 bg-yellow-50 text-yellow-700";
+    }
+  }
+
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">
-          Orders
-        </h1>
+      <div className="mb-6 flex items-center justify-between">
 
-        <p className="text-gray-500">
-          Manage customer orders
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Orders
+          </h1>
+
+          <p className="mt-1 text-gray-500">
+            Manage customer orders
+          </p>
+        </div>
+
+        <div className="rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600">
+          {orders.length} {orders.length === 1 ? "Order" : "Orders"}
+        </div>
+
       </div>
 
-      <div className="overflow-hidden rounded-lg border bg-white">
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
 
-        <table className="w-full">
+        <div className="overflow-x-auto">
 
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-3 text-left">
-                Order ID
-              </th>
+          <table className="w-full">
 
-              <th className="px-4 py-3 text-left">
-                Customer
-              </th>
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Order ID
+                </th>
 
-              <th className="px-4 py-3 text-left">
-                Items
-              </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Customer
+                </th>
 
-              <th className="px-4 py-3 text-left">
-                Total
-              </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Items
+                </th>
 
-              <th className="px-4 py-3 text-left">
-                Status
-              </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Total
+                </th>
 
-              <th className="px-4 py-3 text-left">
-                Date
-              </th>
-            </tr>
-          </thead>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Status
+                </th>
 
-          <tbody>
-
-            {orders.map((order) => (
-              <tr
-                key={order.orderUuid}
-                className="border-t"
-              >
-
-                <td className="px-4 py-4 font-medium">
-                  {order.orderUuid}
-                </td>
-
-                <td className="px-4 py-4">
-                  <p className="font-medium">
-                    {order.customer.name}
-                  </p>
-
-                  <p className="text-sm text-gray-500">
-                    {order.customer.email}
-                  </p>
-                </td>
-
-                <td className="px-4 py-4">
-                  {order.items.length}
-                </td>
-
-                <td className="px-4 py-4">
-                  ₹{order.totalAmount}
-                </td>
-
-                <td className="px-4 py-4">
-
-                    <select
-                        value={order.status}
-                        onChange={(e) =>
-                        updateOrderStatus(order.orderUuid,e.target.value)
-                        }
-                        className="rounded-lg border px-3 py-2"
-                        >
-
-                        <option value="placed">
-                        Placed
-                        </option>
-
-                        <option value="shipped">
-                        Shipped
-                        </option>
-
-                        <option value="delivered">
-                        Delivered
-                        </option>
-
-                    </select>
-
-                </td>
-
-                <td className="px-4 py-4">
-                  {new Date(
-                    order.createdAt
-                  ).toLocaleDateString("en-IN")}
-                </td>
-
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Date
+                </th>
               </tr>
-            ))}
+            </thead>
 
-          </tbody>
+            <tbody className="divide-y divide-gray-100">
 
-        </table>
+              {orders.length === 0 ? (
+
+                <tr>
+                  <td colSpan="6" className="px-6 py-14 text-center text-gray-500">
+                    No orders found
+                  </td>
+                </tr>
+
+              ) : (
+
+                orders.map((order) => (
+                <tr
+                  key={order.orderUuid}
+                  className="transition hover:bg-gray-50"
+                >
+
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    {order.orderNumber}
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <p className="text-sm font-medium text-gray-900">
+                      {order.customer.name}
+                    </p>
+
+                    <p className="text-sm text-gray-500">
+                      {order.customer.email}
+                    </p>
+                  </td>
+
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {order.items.length}
+                  </td>
+
+                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                    ₹{order.totalAmount}
+                  </td>
+
+                  <td className="px-6 py-4">
+
+                      <select
+                          value={order.status}
+                          onChange={(e) =>
+                          updateOrderStatus(order.orderUuid,e.target.value)
+                          }
+                          className={`rounded-lg border px-3 py-2 text-sm font-medium outline-none transition focus:ring-2 focus:ring-blue-100 ${getStatusClasses(order.status)}`}
+                          >
+
+                          <option value="placed">
+                          Placed
+                          </option>
+
+                          <option value="shipped">
+                          Shipped
+                          </option>
+
+                          <option value="delivered">
+                          Delivered
+                          </option>
+
+                      </select>
+
+                  </td>
+
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {new Date(
+                      order.createdAt
+                    ).toLocaleDateString("en-IN")}
+                  </td>
+
+                </tr>
+                ))
+
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
     </div>

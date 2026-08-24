@@ -38,15 +38,15 @@ export default function Hero() {
 
 
   return (
-    <section className="bg-gray-50 px-4 py-6 md:px-6">
+    <section className="bg-linear-to-b from-blue-50 to-gray-50 px-4 py-8 md:px-6">
 
       <div className="mx-auto max-w-6xl">
 
         {/* Carousel */}
-        <div className="relative overflow-hidden rounded-2xl bg-white shadow-md">
+        <div className="relative overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-100">
 
           {/* Image container */}
-          <div className="flex h-70 w-full items-center justify-center sm:h-80 md:h-90">
+          <div className="flex h-70 w-full items-center justify-center sm:h-80 md:h-96">
 
             <img
               src={banners[activeSlide].image}
@@ -60,6 +60,10 @@ export default function Hero() {
                 ease-in-out
               "
             />
+
+            {/* subtle gradient edges so images blend into the card */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-linear-to-r from-white to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-linear-to-l from-white to-transparent" />
 
           </div>
 
@@ -76,14 +80,20 @@ export default function Hero() {
               left-3
               top-1/2
               -translate-y-1/2
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
               rounded-full
               bg-white/90
-              px-3
-              py-2
               text-lg
+              text-gray-700
               shadow-md
               transition
+              hover:scale-105
               hover:bg-white
+              hover:text-blue-600
             "
           >
             ❮
@@ -102,14 +112,20 @@ export default function Hero() {
               right-3
               top-1/2
               -translate-y-1/2
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
               rounded-full
               bg-white/90
-              px-3
-              py-2
               text-lg
+              text-gray-700
               shadow-md
               transition
+              hover:scale-105
               hover:bg-white
+              hover:text-blue-600
             "
           >
             ❯
@@ -132,7 +148,7 @@ export default function Hero() {
                   ${
                     activeSlide === index
                       ? "w-7 bg-blue-600"
-                      : "w-2 bg-gray-400"
+                      : "w-2 bg-gray-300 hover:bg-gray-400"
                   }
                 `}
               />
