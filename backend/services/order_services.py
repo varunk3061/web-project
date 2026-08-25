@@ -1,13 +1,18 @@
 from database import db
 from uuid import uuid4
 from datetime import datetime
-from bson import ObjectId
+
 
 def generate_order_number():
     return f"ORD-{str(uuid4())[:8].upper()}"
 
 
-def create_order(user_id, shipping_address, productUuid=None, quantity=None):
+def create_order(
+    user_uuid,
+    shipping_address,
+    productUuid=None,
+    quantity=None
+):
 
     cart_collection = db["carts"]
     order_collection = db["orders"]
@@ -39,10 +44,9 @@ def create_order(user_id, shipping_address, productUuid=None, quantity=None):
         if product["stock"] < quantity:
             return {
                 "message": "Not enough stock"
-        }
+            }
 
         order_items.append({
-            "productId": product["_id"],
             "productUuid": product["productUuid"],
             "title": product["title"],
             "price": product["price"],
@@ -58,7 +62,7 @@ def create_order(user_id, shipping_address, productUuid=None, quantity=None):
     else:
 
         cart = cart_collection.find_one({
-            "userId": user_id
+            "userUuid": user_uuid
         })
 
         if cart is None or not cart.get("items"):
@@ -69,7 +73,7 @@ def create_order(user_id, shipping_address, productUuid=None, quantity=None):
         for item in cart["items"]:
 
             product = product_collection.find_one({
-                "_id": item["productId"]
+                "productUuid": item["productUuid"]
             })
 
             if product is None:
@@ -81,14 +85,11 @@ def create_order(user_id, shipping_address, productUuid=None, quantity=None):
                 return {
                     "message": f"Not enough stock for {product['title']}"
                 }
-            
+
             price = product["price"]
 
-            
-
             order_items.append({
-                "productId": product["_id"],
-                "productUuid": product["productUuid"],       
+                "productUuid": product["productUuid"],
                 "title": product["title"],
                 "price": price,
                 "quantity": item_quantity
@@ -111,22 +112,33 @@ def create_order(user_id, shipping_address, productUuid=None, quantity=None):
 
     order = {
         "orderUuid": str(uuid4()),
-        "userId": user_id,
+
+        "userUuid": user_uuid,
+
         "orderNumber": generate_order_number(),
+
         "items": order_items,
+
         "totalAmount": total_amount,
+
         "shippingAddress": shipping_address,
+
         "status": "placed",
+
         "createdAt": datetime.utcnow()
     }
 
     order_collection.insert_one(order)
 
+    # ==============================
+    # REDUCE PRODUCT STOCK
+    # ==============================
+
     for item in order_items:
 
         product_collection.update_one(
             {
-                "_id": item["productId"]
+                "productUuid": item["productUuid"]
             },
             {
                 "$inc": {
@@ -146,7 +158,7 @@ def create_order(user_id, shipping_address, productUuid=None, quantity=None):
 
         cart_collection.update_one(
             {
-                "userId": user_id
+                "userUuid": user_uuid
             },
             {
                 "$set": {
@@ -162,28 +174,14 @@ def create_order(user_id, shipping_address, productUuid=None, quantity=None):
         "totalAmount": total_amount
     }
 
-#Helper function convert the product_id to productUuid which is useful for get_orders
-def get_product_uuid(product_id):
 
-    product_collection = db["products"]
-
-    product = product_collection.find_one({
-        "_id": product_id
-    })
-
-    if product:
-        return product["productUuid"]
-
-    return None
-
-
-def get_orders(user_id):
+def get_orders(user_uuid):
 
     order_collection = db["orders"]
 
     orders = list(
         order_collection.find({
-            "userId": user_id
+            "userUuid": user_uuid
         }).sort("createdAt", -1)
     )
 
@@ -192,65 +190,121 @@ def get_orders(user_id):
     for order in orders:
 
         result.append({
-            "orderUuid": order["orderUuid"],
-            "orderNumber": order.get("orderNumber"),
+
+            "orderUuid":
+                order["orderUuid"],
+
+            "orderNumber":
+                order.get("orderNumber"),
+
             "items": [
+
                 {
-                    "productUuid": item["productUuid"],
-                    "title": item["title"],
-                    "price": item["price"],
-                    "quantity": item["quantity"]
+                    "productUuid":
+                        item["productUuid"],
+
+                    "title":
+                        item["title"],
+
+                    "price":
+                        item["price"],
+
+                    "quantity":
+                        item["quantity"]
                 }
+
                 for item in order["items"]
             ],
-            "totalAmount": order["totalAmount"],
-            "shippingAddress": order["shippingAddress"],
-            "status": order["status"],
-            "createdAt": order["createdAt"]
+
+            "totalAmount":
+                order["totalAmount"],
+
+            "shippingAddress":
+                order["shippingAddress"],
+
+            "status":
+                order["status"],
+
+            "createdAt":
+                order["createdAt"]
         })
 
     return result
+
 
 def get_all_orders():
 
     order_collection = db["orders"]
     user_collection = db["users"]
 
-    orders = list(order_collection.find({})
-        .sort("createdAt", -1)  #sorting descending means new order comes first
+    orders = list(
+        order_collection.find({})
+        .sort("createdAt", -1)
     )
 
     result = []
 
     for order in orders:
-         
+
         user = user_collection.find_one({
-        "_id": ObjectId(order["userId"])  #order madhe user_id ahe tya varun user che info kadla
+            "userUuid": order["userUuid"]
         })
 
         result.append({
-            "orderUuid": order["orderUuid"],
-            "orderNumber": order.get("orderNumber"),
+
+            "orderUuid":
+                order["orderUuid"],
+
+            "orderNumber":
+                order.get("orderNumber"),
+
             "customer": {
-                "name": user["name"] if user else "Unknown",
-                "email": user["email"] if user else "Unknown"
+
+                "name":
+                    user["name"]
+                    if user
+                    else "Unknown",
+
+                "email":
+                    user["email"]
+                    if user
+                    else "Unknown"
             },
+
             "items": [
+
                 {
-                    "productUuid": item["productUuid"],
-                    "title": item["title"],
-                    "price": item["price"],
-                    "quantity": item["quantity"]
+                    "productUuid":
+                        item["productUuid"],
+
+                    "title":
+                        item["title"],
+
+                    "price":
+                        item["price"],
+
+                    "quantity":
+                        item["quantity"]
                 }
+
                 for item in order["items"]
             ],
-            "totalAmount": order["totalAmount"],
-            "shippingAddress": order["shippingAddress"],
-            "status": order["status"],
-            "createdAt": order["createdAt"]
+
+            "totalAmount":
+                order["totalAmount"],
+
+            "shippingAddress":
+                order["shippingAddress"],
+
+            "status":
+                order["status"],
+
+            "createdAt":
+                order["createdAt"]
         })
 
     return result
+
 
 def update_order_status(orderUuid, status):
 
@@ -265,14 +319,17 @@ def update_order_status(orderUuid, status):
     ]
 
     if status not in allowed_statuses:
+
         return {
             "message": "Invalid order status"
         }
 
     result = order_collection.update_one(
+
         {
             "orderUuid": orderUuid
         },
+
         {
             "$set": {
                 "status": status
@@ -281,6 +338,7 @@ def update_order_status(orderUuid, status):
     )
 
     if result.matched_count == 0:
+
         return {
             "message": "Order not found"
         }

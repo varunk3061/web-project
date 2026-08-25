@@ -3,12 +3,50 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import {
+  CheckCircle2,
+  AlertCircle,
+  X,
+  Loader2,
+} from "lucide-react";
+
 export default function WishlistPage() {
   const router = useRouter();
 
   const [wishlist, setWishlist] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // =========================
+  // TOAST STATE
+  // =========================
+
+  const [toast, setToast] = useState(null);
+
+  // =========================
+  // AUTO HIDE TOAST
+  // =========================
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  // =========================
+  // SHOW TOAST
+  // =========================
+
+  const showToast = (message, type = "success") => {
+    setToast({
+      message,
+      type,
+    });
+  };
 
   // =========================
   // GET WISHLIST
@@ -48,10 +86,12 @@ export default function WishlistPage() {
       }
 
       setWishlist(data);
+
     } catch (error) {
       console.error(error);
 
       setError(error.message);
+
     } finally {
       setLoading(false);
     }
@@ -62,132 +102,6 @@ export default function WishlistPage() {
   // =========================
 
   async function addToCart(productUuid) {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    router.push("/login");
-    return;
-  }
-
-  try {
-    // =========================
-    // 1. ADD PRODUCT TO CART
-    // =========================
-
-    const cartResponse = await fetch(
-      "http://localhost:8000/cart",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-
-        body: JSON.stringify({
-          productUuid: productUuid,
-          quantity: 1,
-          variantUuid: null,
-        }),
-      }
-    );
-
-    const cartData = await cartResponse.json();
-
-    if (cartResponse.status === 401) {
-      localStorage.removeItem("token");
-      router.push("/login");
-      return;
-    }
-
-    // If adding to cart failed
-    if (!cartResponse.ok) {
-      alert(
-        cartData.detail ||
-          cartData.message ||
-          "Failed to add to cart"
-      );
-
-      return;
-    }
-
-    // =========================
-    // 2. REMOVE FROM WISHLIST
-    // =========================
-
-    const wishlistResponse = await fetch(
-      `http://localhost:8000/wishlist/${productUuid}`,
-      {
-        method: "DELETE",
-
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const wishlistData =
-      await wishlistResponse.json();
-
-    if (!wishlistResponse.ok) {
-      alert(
-        "Product was added to cart, but could not be removed from wishlist."
-      );
-
-      // Refresh wishlist just in case
-      fetchWishlist();
-
-      return;
-    }
-
-    // =========================
-    // 3. REMOVE FROM UI IMMEDIATELY
-    // =========================
-
-    setWishlist((previousWishlist) => {
-      if (!previousWishlist) {
-        return previousWishlist;
-      }
-
-      return {
-        ...previousWishlist,
-
-        items: previousWishlist.items.filter(
-          (item) =>
-            item.productUuid !== productUuid
-        ),
-      };
-    });
-
-    // =========================
-    // 4. UPDATE NAVBAR COUNTS
-    // =========================
-
-    window.dispatchEvent(
-      new Event("cartWishlistUpdated")
-    );
-
-    // =========================
-    // 5. SUCCESS MESSAGE
-    // =========================
-
-    alert(
-      cartData.message ||
-        "Product added to cart!"
-    );
-
-  } catch (error) {
-    console.error(error);
-
-    alert("Something went wrong");
-  }
-}
-
-  // =========================
-  // REMOVE FROM WISHLIST
-  // =========================
-
-  async function removeFromWishlist(productUuid) {
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -196,6 +110,156 @@ export default function WishlistPage() {
     }
 
     try {
+
+      // =========================
+      // 1. ADD PRODUCT TO CART
+      // =========================
+
+      const cartResponse = await fetch(
+        "http://localhost:8000/cart",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+
+          body: JSON.stringify({
+            productUuid: productUuid,
+            quantity: 1,
+            variantUuid: null,
+          }),
+        }
+      );
+
+      const cartData = await cartResponse.json();
+
+      // =========================
+      // TOKEN EXPIRED
+      // =========================
+
+      if (cartResponse.status === 401) {
+        localStorage.removeItem("token");
+        router.push("/login");
+        return;
+      }
+
+      // =========================
+      // CART ERROR
+      // =========================
+
+      if (!cartResponse.ok) {
+
+        showToast(
+          cartData.detail ||
+            cartData.message ||
+            "Failed to add to cart",
+          "error"
+        );
+
+        return;
+      }
+
+      // =========================
+      // 2. REMOVE FROM WISHLIST
+      // =========================
+
+      const wishlistResponse = await fetch(
+        `http://localhost:8000/wishlist/${productUuid}`,
+        {
+          method: "DELETE",
+
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const wishlistData =
+        await wishlistResponse.json();
+
+      // =========================
+      // WISHLIST REMOVE ERROR
+      // =========================
+
+      if (!wishlistResponse.ok) {
+
+        showToast(
+          "Product was added to cart, but could not be removed from wishlist.",
+          "error"
+        );
+
+        fetchWishlist();
+
+        return;
+      }
+
+      // =========================
+      // 3. REMOVE FROM UI
+      // =========================
+
+      setWishlist((previousWishlist) => {
+
+        if (!previousWishlist) {
+          return previousWishlist;
+        }
+
+        return {
+          ...previousWishlist,
+
+          items:
+            previousWishlist.items.filter(
+              (item) =>
+                item.productUuid !== productUuid
+            ),
+        };
+      });
+
+      // =========================
+      // 4. UPDATE NAVBAR COUNTS
+      // =========================
+
+      window.dispatchEvent(
+        new Event("cartWishlistUpdated")
+      );
+
+      // =========================
+      // 5. SUCCESS TOAST
+      // =========================
+
+      showToast(
+        cartData.message ||
+          "Product added to cart!",
+        "success"
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      showToast(
+        "Something went wrong. Please try again.",
+        "error"
+      );
+    }
+  }
+
+  // =========================
+  // REMOVE FROM WISHLIST
+  // =========================
+
+  async function removeFromWishlist(productUuid) {
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+
       const response = await fetch(
         `http://localhost:8000/wishlist/${productUuid}`,
         {
@@ -209,13 +273,22 @@ export default function WishlistPage() {
 
       const data = await response.json();
 
+      // =========================
+      // TOKEN EXPIRED
+      // =========================
+
       if (response.status === 401) {
         localStorage.removeItem("token");
         router.push("/login");
         return;
       }
 
+      // =========================
+      // ERROR
+      // =========================
+
       if (!response.ok) {
+
         throw new Error(
           data.detail ||
             data.message ||
@@ -223,8 +296,12 @@ export default function WishlistPage() {
         );
       }
 
-      // Remove immediately from UI
+      // =========================
+      // REMOVE FROM UI
+      // =========================
+
       setWishlist((previousWishlist) => {
+
         if (!previousWishlist) {
           return previousWishlist;
         }
@@ -232,21 +309,42 @@ export default function WishlistPage() {
         return {
           ...previousWishlist,
 
-          items: previousWishlist.items.filter(
-            (item) =>
-              item.productUuid !== productUuid
-          ),
+          items:
+            previousWishlist.items.filter(
+              (item) =>
+                item.productUuid !== productUuid
+            ),
         };
       });
 
-      // Tell Navbar wishlist count changed
+      // =========================
+      // UPDATE NAVBAR
+      // =========================
+
       window.dispatchEvent(
         new Event("cartWishlistUpdated")
       );
+
+      // =========================
+      // SUCCESS TOAST
+      // =========================
+
+      showToast(
+        data.message ||
+          "Product removed from wishlist!",
+        "success"
+      );
+
     } catch (error) {
+
       console.error(error);
 
       setError(error.message);
+
+      showToast(
+        error.message,
+        "error"
+      );
     }
   }
 
@@ -258,16 +356,94 @@ export default function WishlistPage() {
     fetchWishlist();
   }, []);
 
+  // =====================================================
+  // TOAST COMPONENT
+  // =====================================================
+
+  const Toast = () => {
+
+    if (!toast) {
+      return null;
+    }
+
+    return (
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-gray-200/80 bg-white p-4 text-sm font-medium text-gray-900 shadow-xl shadow-gray-200/60">
+
+        {/* ICON */}
+
+        {toast.type === "success" ? (
+
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+
+            <CheckCircle2 size={20} />
+
+          </div>
+
+        ) : (
+
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+
+            <AlertCircle size={20} />
+
+          </div>
+
+        )}
+
+        {/* MESSAGE */}
+
+        <div className="pr-2">
+
+          <p className="font-semibold text-gray-900">
+
+            {toast.type === "success"
+              ? "Success!"
+              : "Notice"}
+
+          </p>
+
+          <p className="text-xs text-gray-500">
+            {toast.message}
+          </p>
+
+        </div>
+
+        {/* CLOSE */}
+
+        <button
+          onClick={() => setToast(null)}
+          className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        >
+          <X size={16} />
+        </button>
+
+      </div>
+    );
+  };
+
   // =========================
   // LOADING
   // =========================
 
   if (loading) {
+
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-lg text-gray-500">
-          Loading wishlist...
-        </p>
+      <div className="relative flex min-h-screen items-center justify-center">
+
+        <Toast />
+
+        <div className="flex flex-col items-center gap-3">
+
+          <Loader2
+            size={35}
+            className="animate-spin text-blue-600"
+          />
+
+          <p className="text-lg text-gray-500">
+            Loading wishlist...
+          </p>
+
+        </div>
+
       </div>
     );
   }
@@ -277,11 +453,16 @@ export default function WishlistPage() {
   // =========================
 
   if (error && !wishlist) {
+
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="relative flex min-h-screen items-center justify-center">
+
+        <Toast />
+
         <p className="text-red-600">
           {error}
         </p>
+
       </div>
     );
   }
@@ -294,8 +475,11 @@ export default function WishlistPage() {
     !wishlist ||
     wishlist.items.length === 0
   ) {
+
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-6">
+      <div className="relative flex min-h-screen flex-col items-center justify-center px-6">
+
+        <Toast />
 
         <div className="text-center">
 
@@ -330,7 +514,11 @@ export default function WishlistPage() {
   // =========================
 
   return (
-    <div className="min-h-screen bg-gray-100 px-6 py-8">
+    <div className="relative min-h-screen bg-gray-100 px-6 py-8">
+
+      {/* TOAST */}
+
+      <Toast />
 
       <div className="mx-auto max-w-6xl">
 
@@ -343,15 +531,18 @@ export default function WishlistPage() {
           </h1>
 
           <p className="mt-1 text-gray-500">
+
             {wishlist.items.length}{" "}
+
             {wishlist.items.length === 1
               ? "product"
               : "products"}{" "}
+
             in your wishlist
+
           </p>
 
         </div>
-
 
         {/* ERROR */}
 
@@ -360,7 +551,6 @@ export default function WishlistPage() {
             {error}
           </div>
         )}
-
 
         {/* PRODUCTS */}
 
@@ -395,7 +585,6 @@ export default function WishlistPage() {
 
               </div>
 
-
               {/* DETAILS */}
 
               <div className="p-4">
@@ -406,23 +595,22 @@ export default function WishlistPage() {
                   {product.title}
                 </h2>
 
-
                 {/* PRICE */}
 
                 <p className="mt-2 text-xl font-bold text-gray-900">
+
                   ₹
                   {product.price.toLocaleString(
                     "en-IN"
                   )}
-                </p>
 
+                </p>
 
                 {/* RATING */}
 
                 <p className="mt-2 text-sm text-gray-600">
                   ⭐ {product.rating}
                 </p>
-
 
                 {/* BUTTONS */}
 
@@ -441,7 +629,6 @@ export default function WishlistPage() {
                     Add to Cart
                   </button>
 
-
                   {/* REMOVE */}
 
                   <button
@@ -456,7 +643,6 @@ export default function WishlistPage() {
                   </button>
 
                 </div>
-
 
                 {/* VIEW DETAILS */}
 

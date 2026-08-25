@@ -10,7 +10,6 @@ from services.cart_services import (
 )
 
 from dependencies.auth import get_current_user
-from utils.user_utils import get_user_by_uuid
 
 
 router = APIRouter()
@@ -22,14 +21,10 @@ def add_cart_item(
     current_user=Depends(get_current_user)
 ):
 
-    user = get_user_by_uuid(
-        current_user["userUuid"]
-    )
-
-    user_id = user["_id"]
+    user_uuid = current_user["userUuid"]
 
     return add_to_cart(
-        user_id,
+        user_uuid,
         cart_item.productUuid,
         cart_item.variantUuid,
         cart_item.quantity
@@ -41,13 +36,9 @@ def read_cart(
     current_user=Depends(get_current_user)
 ):
 
-    user = get_user_by_uuid(
-        current_user["userUuid"]
-    )
+    user_uuid = current_user["userUuid"]
 
-    user_id = user["_id"]
-
-    return get_cart(user_id)
+    return get_cart(user_uuid)
 
 
 @router.put("/cart/{productUuid}")
@@ -58,14 +49,10 @@ def update_cart_item(
     current_user=Depends(get_current_user)
 ):
 
-    user = get_user_by_uuid(
-        current_user["userUuid"]
-    )
-
-    user_id = user["_id"]
+    user_uuid = current_user["userUuid"]
 
     return update_cart_quantity(
-        user_id,
+        user_uuid,
         productUuid,
         variantUuid,
         quantity
@@ -79,14 +66,10 @@ def delete_cart_item(
     current_user=Depends(get_current_user)
 ):
 
-    user = get_user_by_uuid(
-        current_user["userUuid"]
-    )
-
-    user_id = user["_id"]
+    user_uuid = current_user["userUuid"]
 
     return remove_from_cart(
-        user_id,
+        user_uuid,
         productUuid,
         variantUuid
     )

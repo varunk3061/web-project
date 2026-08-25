@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 def add_to_wishlist(
-    user_id,
+    user_uuid,
     productUuid,
     variantUuid=None
 ):
@@ -12,7 +12,7 @@ def add_to_wishlist(
     wishlist_collection = db["wishlists"]
     product_collection = db["products"]
 
-    # Find product
+    # Find product using public UUID
     product = product_collection.find_one({
         "productUuid": productUuid
     })
@@ -47,7 +47,7 @@ def add_to_wishlist(
     # -----------------------------
 
     wishlist = wishlist_collection.find_one({
-        "userId": user_id
+        "userUuid": user_uuid
     })
 
     # -----------------------------
@@ -60,11 +60,11 @@ def add_to_wishlist(
 
             "wishlistUuid": str(uuid4()),
 
-            "userId": user_id,
+            "userUuid": user_uuid,
 
             "items": [
                 {
-                    "productId": product["_id"],
+                    "productUuid": productUuid,
                     "variantUuid": variantUuid,
                     "addedAt": datetime.utcnow()
                 }
@@ -82,7 +82,7 @@ def add_to_wishlist(
     for item in wishlist["items"]:
 
         if (
-            item["productId"] == product["_id"]
+            item["productUuid"] == productUuid
             and
             item.get("variantUuid") == variantUuid
         ):
@@ -98,13 +98,13 @@ def add_to_wishlist(
     wishlist_collection.update_one(
 
         {
-            "userId": user_id
+            "userUuid": user_uuid
         },
 
         {
             "$push": {
                 "items": {
-                    "productId": product["_id"],
+                    "productUuid": productUuid,
                     "variantUuid": variantUuid,
                     "addedAt": datetime.utcnow()
                 }
@@ -116,14 +116,15 @@ def add_to_wishlist(
         "message": "Product added to wishlist"
     }
 
-def get_wishlist(user_id):
+
+def get_wishlist(user_uuid):
 
     wishlist_collection = db["wishlists"]
     product_collection = db["products"]
 
     # Find user's wishlist
     wishlist = wishlist_collection.find_one({
-        "userId": user_id
+        "userUuid": user_uuid
     })
 
     # Wishlist doesn't exist
@@ -137,9 +138,9 @@ def get_wishlist(user_id):
     # Go through every wishlist item
     for item in wishlist["items"]:
 
-        # Find current product
+        # Find current product using UUID
         product = product_collection.find_one({
-            "_id": item["productId"]
+            "productUuid": item["productUuid"]
         })
 
         if product:
@@ -179,6 +180,9 @@ def get_wishlist(user_id):
                 "productUuid":
                     product["productUuid"],
 
+                "variantUuid":
+                    item.get("variantUuid"),
+
                 "title":
                     product["title"],
 
@@ -201,35 +205,20 @@ def get_wishlist(user_id):
     }
 
 
-
-def remove_from_wishlist(
-    user_id,
-    productUuid,
-    variantUuid=None
-):
+def remove_from_wishlist(user_uuid,productUuid,variantUuid=None):
 
     wishlist_collection = db["wishlists"]
-    product_collection = db["products"]
-
-    product = product_collection.find_one({
-        "productUuid": productUuid
-    })
-
-    if product is None:
-        return {
-            "message": "Product not found"
-        }
 
     result = wishlist_collection.update_one(
 
         {
-            "userId": user_id
+            "userUuid": user_uuid
         },
 
         {
             "$pull": {
                 "items": {
-                    "productId": product["_id"],
+                    "productUuid": productUuid,
                     "variantUuid": variantUuid
                 }
             }

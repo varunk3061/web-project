@@ -363,7 +363,7 @@ export default function CheckoutPage() {
             <button
               onClick={placeOrder}
               disabled={placingOrder}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-bold text-white shadow-xs transition hover:bg-blue-700 active:scale-98 disabled:opacity-50"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl cursor-pointer bg-blue-600 py-3.5 font-bold text-white shadow-xs transition hover:bg-blue-700 active:scale-98 disabled:opacity-50"
             >
               {placingOrder ? (
                 <>

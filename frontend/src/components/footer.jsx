@@ -8,7 +8,7 @@ export default function Footer() {
         {/* About */}
         <div>
           <h2 className="mb-4 text-xl font-bold text-white">
-            Flipkart Clone
+            AuraBazar
           </h2>
 
           <p className="text-sm leading-6">
@@ -55,11 +55,11 @@ export default function Footer() {
           </h3>
 
           <p className="text-sm">
-            Email: support@flipkartclone.com
+            Email: support@aurabazzar.com
           </p>
 
           <p className="mt-2 text-sm">
-            Phone: +91 98765 43210
+            Phone: +91 0000 00 0000
           </p>
         </div>
 
@@ -69,7 +69,7 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="border-t border-gray-700 py-4 text-center text-sm">
-        © 2026 Flipkart Clone. All rights reserved.
+        © 2026 Aurabazar. All rights reserved.
       </div>
 
 

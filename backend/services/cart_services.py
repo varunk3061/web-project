@@ -1,10 +1,9 @@
 from database import db
-from bson import ObjectId
 from uuid import uuid4
 from datetime import datetime
 
 
-def add_to_cart(user_id, productUuid, variantUuid, quantity):
+def add_to_cart(user_uuid, productUuid, variantUuid, quantity):
 
     cart_collection = db["carts"]
     product_collection = db["products"]
@@ -79,7 +78,7 @@ def add_to_cart(user_id, productUuid, variantUuid, quantity):
     # --------------------------------
 
     cart = cart_collection.find_one({
-        "userId": user_id
+        "userUuid": user_uuid
     })
 
     # --------------------------------
@@ -92,11 +91,11 @@ def add_to_cart(user_id, productUuid, variantUuid, quantity):
 
             "cartUuid": str(uuid4()),
 
-            "userId": user_id,
+            "userUuid": user_uuid,
 
             "items": [
                 {
-                    "productId": product["_id"],
+                    "productUuid": productUuid,
 
                     "variantUuid": variantUuid,
 
@@ -123,7 +122,7 @@ def add_to_cart(user_id, productUuid, variantUuid, quantity):
     for item in cart["items"]:
 
         if (
-            item["productId"] == product["_id"]
+            item["productUuid"] == productUuid
             and
             item.get("variantUuid") == variantUuid
         ):
@@ -141,10 +140,10 @@ def add_to_cart(user_id, productUuid, variantUuid, quantity):
             cart_collection.update_one(
 
                 {
-                    "userId": user_id,
+                    "userUuid": user_uuid,
                     "items": {
                         "$elemMatch": {
-                            "productId": product["_id"],
+                            "productUuid": productUuid,
                             "variantUuid": variantUuid
                         }
                     }
@@ -173,14 +172,14 @@ def add_to_cart(user_id, productUuid, variantUuid, quantity):
     cart_collection.update_one(
 
         {
-            "userId": user_id
+            "userUuid": user_uuid
         },
 
         {
             "$push": {
                 "items": {
 
-                    "productId": product["_id"],
+                    "productUuid": productUuid,
 
                     "variantUuid": variantUuid,
 
@@ -204,13 +203,14 @@ def add_to_cart(user_id, productUuid, variantUuid, quantity):
 
 
 def update_cart_quantity(
-    user_id,
+    user_uuid,
     productUuid,
     variantUuid,
     quantity
 ):
 
     if quantity < 1:
+
         return {
             "message": "Quantity must be at least 1"
         }
@@ -223,6 +223,7 @@ def update_cart_quantity(
     })
 
     if product is None:
+
         return {
             "message": "Product not found"
         }
@@ -243,9 +244,7 @@ def update_cart_quantity(
         ):
 
             if (
-                product_variant.get("variantUuid")
-                == variantUuid
-            ):
+                product_variant.get("variantUuid")== variantUuid):
 
                 variant = product_variant
 
@@ -276,10 +275,10 @@ def update_cart_quantity(
     result = cart_collection.update_one(
 
         {
-            "userId": user_id,
+            "userUuid": user_uuid,
             "items": {
                 "$elemMatch": {
-                    "productId": product["_id"],
+                    "productUuid": productUuid,
                     "variantUuid": variantUuid
                 }
             }
@@ -304,16 +303,17 @@ def update_cart_quantity(
     }
 
 
-def get_cart(user_id):
+def get_cart(user_uuid):
 
     cart_collection = db["carts"]
     product_collection = db["products"]
 
     cart = cart_collection.find_one({
-        "userId": user_id
+        "userUuid": user_uuid
     })
 
     if cart is None:
+
         return {
             "items": []
         }
@@ -323,7 +323,7 @@ def get_cart(user_id):
     for item in cart["items"]:
 
         product = product_collection.find_one({
-            "_id": item["productId"]
+            "productUuid": item["productUuid"]
         })
 
         if product:
@@ -334,16 +334,10 @@ def get_cart(user_id):
 
             if variantUuid:
 
-                for product_variant in product.get(
-                    "variants",
-                    []
-                ):
+                for product_variant in product.get("variants",[]):
 
                     if (
-                        product_variant.get(
-                            "variantUuid"
-                        )
-                        == variantUuid
+                        product_variant.get("variantUuid")== variantUuid
                     ):
 
                         variant = product_variant
@@ -352,23 +346,17 @@ def get_cart(user_id):
 
             cart_items.append({
 
-                "productUuid":
-                    product["productUuid"],
+                "productUuid":product["productUuid"],
 
-                "variantUuid":
-                    variantUuid,
+                "variantUuid":variantUuid,
 
-                "title":
-                    item["title"],
+                "title":item["title"],
 
-                "price":
-                    item["price"],
+                "price":item["price"],
 
-                "imageUrls":
-                    product.get("imageUrls"),
+                "imageUrls":product.get("imageUrls"),
 
-                "quantity":
-                    item["quantity"],
+                "quantity":item["quantity"],
 
                 "attributes":
                     variant.get("attributes", {})
@@ -382,20 +370,13 @@ def get_cart(user_id):
     }
 
 
-def remove_from_cart(user_id, productUuid, variantUuid=None):
+def remove_from_cart(
+    user_uuid,
+    productUuid,
+    variantUuid=None
+):
 
     cart_collection = db["carts"]
-    product_collection = db["products"]
-
-    # Find product
-    product = product_collection.find_one({
-        "productUuid": productUuid
-    })
-
-    if product is None:
-        return {
-            "message": "Product not found"
-        }
 
     # --------------------------------
     # Remove specific variant
@@ -404,16 +385,19 @@ def remove_from_cart(user_id, productUuid, variantUuid=None):
     if variantUuid:
 
         result = cart_collection.update_one(
+
             {
-                "userId": user_id
+                "userUuid": user_uuid
             },
+
             {
                 "$pull": {
                     "items": {
-                        "productId": product["_id"],
+                        "productUuid": productUuid,
                         "variantUuid": variantUuid
                     }
                 },
+
                 "$set": {
                     "updatedAt": datetime.utcnow()
                 }
@@ -427,16 +411,19 @@ def remove_from_cart(user_id, productUuid, variantUuid=None):
     else:
 
         result = cart_collection.update_one(
+
             {
-                "userId": user_id
+                "userUuid": user_uuid
             },
+
             {
                 "$pull": {
                     "items": {
-                        "productId": product["_id"],
+                        "productUuid": productUuid,
                         "variantUuid": None
                     }
                 },
+
                 "$set": {
                     "updatedAt": datetime.utcnow()
                 }
