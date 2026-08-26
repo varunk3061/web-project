@@ -85,7 +85,7 @@ export default function Sidebar() {
         <div className="border-t border-gray-100 p-4">
           <button
             onClick={() => setShowPopup(true)}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 cursor-pointer text-sm font-medium text-red-600 transition hover:bg-red-50"
           >
             <LogOut size={19} />
             Logout
@@ -104,14 +104,14 @@ export default function Sidebar() {
             <div className="mt-6 flex justify-center gap-4">
               <button
                 onClick={() => setShowPopup(false)}
-                className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                className="rounded-lg border border-gray-300 cursor-pointer px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
               >
                 Cancel
               </button>
 
               <button
                 onClick={handleLogout}
-                className="rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white hover:bg-red-700"
+                className="rounded-lg bg-red-600 px-5 py-2 cursor-pointer text-sm font-medium text-white hover:bg-red-700"
               >
                 Yes
               </button>

@@ -60,11 +60,7 @@ export default function Cart() {
   // UPDATE QUANTITY
   // =========================
 
-  async function updateQuantity(
-    productUuid,
-    variantUuid,
-    quantity
-  ) {
+  async function updateQuantity(productUuid,variantUuid,quantity) {
     const token = localStorage.getItem("token");
 
     if (quantity < 1) {
@@ -77,9 +73,7 @@ export default function Cart() {
 
     // Add variantUuid if this is a variant
     if (variantUuid) {
-      url += `&variantUuid=${encodeURIComponent(
-        variantUuid
-      )}`;
+      url += `&variantUuid=${encodeURIComponent(variantUuid)}`;
     }
 
     const response = await fetch(url, {
@@ -371,7 +365,7 @@ export default function Cart() {
                             item.variantUuid
                           )
                         }
-                        className="flex h-fit shrink-0 items-center gap-1.5 rounded-lg border border-transparent px-2.5 py-1.5 text-sm font-medium text-red-500 transition hover:border-red-100 hover:bg-red-50 hover:text-red-700"
+                        className="flex h-fit shrink-0 items-center cursor-pointer gap-1.5 rounded-lg border border-transparent px-2.5 py-1.5 text-sm font-medium text-red-500 transition hover:border-red-100 hover:bg-red-50 hover:text-red-700"
                       >
                         <Trash2 size={15} />
                         Remove

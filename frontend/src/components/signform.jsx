@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function SignupForm() {
   const router = useRouter();
-
+  const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +17,7 @@ export default function SignupForm() {
 
     // Check whether passwords match
     if (password !== confirmPassword) {
-      console.log("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
 
@@ -40,7 +40,7 @@ export default function SignupForm() {
     if (response.ok) {
       router.push("/login");
     } else {
-      console.log(data);
+      setError(data.detail || "Registration failed");
     }
   }
 
@@ -54,6 +54,12 @@ export default function SignupForm() {
       <p className="mt-2 text-gray-500">
         Join us and start shopping.
       </p>
+
+      {error && (
+        <p className="mt-4 text-sm text-red-600">
+          {error}
+        </p>
+      )}
 
       <form
         onSubmit={handleSignup}

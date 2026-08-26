@@ -28,13 +28,15 @@ export default function WishlistPage() {
   // =========================
 
   useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => {
-        setToast(null);
-      }, 3500);
-
-      return () => clearTimeout(timer);
+    if (!toast) {
+      return;
     }
+
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 3500);
+
+    return () => clearTimeout(timer);
   }, [toast]);
 
   // =========================
@@ -77,6 +79,12 @@ export default function WishlistPage() {
 
       const data = await response.json();
 
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        router.push("/login");
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(
           data.detail ||
@@ -90,7 +98,9 @@ export default function WishlistPage() {
     } catch (error) {
       console.error(error);
 
-      setError(error.message);
+      setError(
+        error.message || "Something went wrong"
+      );
 
     } finally {
       setLoading(false);
@@ -101,7 +111,7 @@ export default function WishlistPage() {
   // ADD TO CART
   // =========================
 
-  async function addToCart(productUuid) {
+  async function addToCart(productUuid, variantUuid) {
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -110,10 +120,11 @@ export default function WishlistPage() {
     }
 
     try {
+      // ==========================================
+      // STEP 1: ADD PRODUCT TO CART
+      // ==========================================
 
-      // =========================
-      // 1. ADD PRODUCT TO CART
-      // =========================
+      console.log("Sending POST /cart");
 
       const cartResponse = await fetch(
         "http://localhost:8000/cart",
@@ -128,16 +139,21 @@ export default function WishlistPage() {
           body: JSON.stringify({
             productUuid: productUuid,
             quantity: 1,
-            variantUuid: null,
+            variantUuid: variantUuid || null,
           }),
         }
       );
 
+      console.log(
+        "POST /cart status:",
+        cartResponse.status
+      );
+
       const cartData = await cartResponse.json();
 
-      // =========================
-      // TOKEN EXPIRED
-      // =========================
+      // ==========================================
+      // CHECK AUTH
+      // ==========================================
 
       if (cartResponse.status === 401) {
         localStorage.removeItem("token");
@@ -145,28 +161,36 @@ export default function WishlistPage() {
         return;
       }
 
-      // =========================
-      // CART ERROR
-      // =========================
+      // ==========================================
+      // CART FAILED
+      // ==========================================
 
       if (!cartResponse.ok) {
-
         showToast(
           cartData.detail ||
             cartData.message ||
-            "Failed to add to cart",
+            "Failed to add product to cart",
           "error"
         );
 
         return;
       }
 
-      // =========================
-      // 2. REMOVE FROM WISHLIST
-      // =========================
+      // ==========================================
+      // STEP 2: REMOVE SAME ITEM FROM WISHLIST
+      // ==========================================
+
+      const wishlistUrl = variantUuid
+        ? `http://localhost:8000/wishlist/${productUuid}?variantUuid=${variantUuid}`
+        : `http://localhost:8000/wishlist/${productUuid}`;
+
+      console.log(
+        "Sending DELETE:",
+        wishlistUrl
+      );
 
       const wishlistResponse = await fetch(
-        `http://localhost:8000/wishlist/${productUuid}`,
+        wishlistUrl,
         {
           method: "DELETE",
 
@@ -176,31 +200,37 @@ export default function WishlistPage() {
         }
       );
 
+      console.log(
+        "DELETE /wishlist status:",
+        wishlistResponse.status
+      );
+
       const wishlistData =
         await wishlistResponse.json();
 
-      // =========================
-      // WISHLIST REMOVE ERROR
-      // =========================
+      // ==========================================
+      // WISHLIST REMOVE FAILED
+      // ==========================================
 
       if (!wishlistResponse.ok) {
-
         showToast(
-          "Product was added to cart, but could not be removed from wishlist.",
+          wishlistData.detail ||
+            wishlistData.message ||
+            "Product added to cart, but could not be removed from wishlist.",
           "error"
         );
 
+        // Get latest wishlist from backend
         fetchWishlist();
 
         return;
       }
 
-      // =========================
-      // 3. REMOVE FROM UI
-      // =========================
+      // ==========================================
+      // STEP 3: REMOVE FROM UI
+      // ==========================================
 
       setWishlist((previousWishlist) => {
-
         if (!previousWishlist) {
           return previousWishlist;
         }
@@ -208,35 +238,38 @@ export default function WishlistPage() {
         return {
           ...previousWishlist,
 
-          items:
-            previousWishlist.items.filter(
-              (item) =>
-                item.productUuid !== productUuid
-            ),
+          items: previousWishlist.items.filter(
+            (item) =>
+              !(
+                item.productUuid === productUuid &&
+                item.variantUuid === variantUuid
+              )
+          ),
         };
       });
 
-      // =========================
-      // 4. UPDATE NAVBAR COUNTS
-      // =========================
+      // ==========================================
+      // UPDATE NAVBAR COUNTS
+      // ==========================================
 
       window.dispatchEvent(
         new Event("cartWishlistUpdated")
       );
 
-      // =========================
-      // 5. SUCCESS TOAST
-      // =========================
+      // ==========================================
+      // SUCCESS
+      // ==========================================
 
       showToast(
-        cartData.message ||
-          "Product added to cart!",
+        "Product added to cart!",
         "success"
       );
 
     } catch (error) {
-
-      console.error(error);
+      console.error(
+        "Add to cart error:",
+        error
+      );
 
       showToast(
         "Something went wrong. Please try again.",
@@ -249,8 +282,10 @@ export default function WishlistPage() {
   // REMOVE FROM WISHLIST
   // =========================
 
-  async function removeFromWishlist(productUuid) {
-
+  async function removeFromWishlist(
+    productUuid,
+    variantUuid
+  ) {
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -259,23 +294,41 @@ export default function WishlistPage() {
     }
 
     try {
+      // ==========================================
+      // CREATE DELETE URL
+      // ==========================================
 
-      const response = await fetch(
-        `http://localhost:8000/wishlist/${productUuid}`,
-        {
-          method: "DELETE",
+      const url = variantUuid
+        ? `http://localhost:8000/wishlist/${productUuid}?variantUuid=${variantUuid}`
+        : `http://localhost:8000/wishlist/${productUuid}`;
 
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      console.log(
+        "Sending DELETE:",
+        url
+      );
+
+      // ==========================================
+      // DELETE REQUEST
+      // ==========================================
+
+      const response = await fetch(url, {
+        method: "DELETE",
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log(
+        "DELETE /wishlist status:",
+        response.status
       );
 
       const data = await response.json();
 
-      // =========================
-      // TOKEN EXPIRED
-      // =========================
+      // ==========================================
+      // CHECK AUTH
+      // ==========================================
 
       if (response.status === 401) {
         localStorage.removeItem("token");
@@ -283,12 +336,11 @@ export default function WishlistPage() {
         return;
       }
 
-      // =========================
-      // ERROR
-      // =========================
+      // ==========================================
+      // DELETE FAILED
+      // ==========================================
 
       if (!response.ok) {
-
         throw new Error(
           data.detail ||
             data.message ||
@@ -296,12 +348,11 @@ export default function WishlistPage() {
         );
       }
 
-      // =========================
+      // ==========================================
       // REMOVE FROM UI
-      // =========================
+      // ==========================================
 
       setWishlist((previousWishlist) => {
-
         if (!previousWishlist) {
           return previousWishlist;
         }
@@ -309,25 +360,27 @@ export default function WishlistPage() {
         return {
           ...previousWishlist,
 
-          items:
-            previousWishlist.items.filter(
-              (item) =>
-                item.productUuid !== productUuid
-            ),
+          items: previousWishlist.items.filter(
+            (item) =>
+              !(
+                item.productUuid === productUuid &&
+                item.variantUuid === variantUuid
+              )
+          ),
         };
       });
 
-      // =========================
-      // UPDATE NAVBAR
-      // =========================
+      // ==========================================
+      // UPDATE NAVBAR COUNTS
+      // ==========================================
 
       window.dispatchEvent(
         new Event("cartWishlistUpdated")
       );
 
-      // =========================
-      // SUCCESS TOAST
-      // =========================
+      // ==========================================
+      // SUCCESS
+      // ==========================================
 
       showToast(
         data.message ||
@@ -336,13 +389,19 @@ export default function WishlistPage() {
       );
 
     } catch (error) {
+      console.error(
+        "Remove wishlist error:",
+        error
+      );
 
-      console.error(error);
-
-      setError(error.message);
+      setError(
+        error.message ||
+          "Something went wrong"
+      );
 
       showToast(
-        error.message,
+        error.message ||
+          "Something went wrong",
         "error"
       );
     }
@@ -356,12 +415,11 @@ export default function WishlistPage() {
     fetchWishlist();
   }, []);
 
-  // =====================================================
+  // =========================
   // TOAST COMPONENT
-  // =====================================================
+  // =========================
 
   const Toast = () => {
-
     if (!toast) {
       return null;
     }
@@ -372,50 +430,38 @@ export default function WishlistPage() {
         {/* ICON */}
 
         {toast.type === "success" ? (
-
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-
             <CheckCircle2 size={20} />
-
           </div>
-
         ) : (
-
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
-
             <AlertCircle size={20} />
-
           </div>
-
         )}
 
         {/* MESSAGE */}
 
         <div className="pr-2">
-
           <p className="font-semibold text-gray-900">
-
             {toast.type === "success"
               ? "Success!"
               : "Notice"}
-
           </p>
 
           <p className="text-xs text-gray-500">
             {toast.message}
           </p>
-
         </div>
 
         {/* CLOSE */}
 
         <button
+          type="button"
           onClick={() => setToast(null)}
           className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
         >
           <X size={16} />
         </button>
-
       </div>
     );
   };
@@ -425,7 +471,6 @@ export default function WishlistPage() {
   // =========================
 
   if (loading) {
-
     return (
       <div className="relative flex min-h-screen items-center justify-center">
 
@@ -443,7 +488,6 @@ export default function WishlistPage() {
           </p>
 
         </div>
-
       </div>
     );
   }
@@ -453,7 +497,6 @@ export default function WishlistPage() {
   // =========================
 
   if (error && !wishlist) {
-
     return (
       <div className="relative flex min-h-screen items-center justify-center">
 
@@ -475,7 +518,6 @@ export default function WishlistPage() {
     !wishlist ||
     wishlist.items.length === 0
   ) {
-
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center px-6">
 
@@ -497,6 +539,7 @@ export default function WishlistPage() {
           </p>
 
           <button
+            type="button"
             onClick={() => router.push("/")}
             className="mt-6 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
           >
@@ -504,7 +547,6 @@ export default function WishlistPage() {
           </button>
 
         </div>
-
       </div>
     );
   }
@@ -557,9 +599,8 @@ export default function WishlistPage() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 
           {wishlist.items.map((product) => (
-
             <div
-              key={product.productUuid}
+              key={`${product.productUuid}-${product.variantUuid || "default"}`}
               className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
             >
 
@@ -568,19 +609,15 @@ export default function WishlistPage() {
               <div className="h-64 bg-gray-50">
 
                 {product.imageUrls ? (
-
                   <img
                     src={product.imageUrls}
                     alt={product.title}
                     className="h-full w-full object-contain p-4"
                   />
-
                 ) : (
-
                   <div className="flex h-full items-center justify-center text-gray-400">
                     No image available
                   </div>
-
                 )}
 
               </div>
@@ -598,18 +635,16 @@ export default function WishlistPage() {
                 {/* PRICE */}
 
                 <p className="mt-2 text-xl font-bold text-gray-900">
-
                   ₹
-                  {product.price.toLocaleString(
-                    "en-IN"
-                  )}
-
+                  {Number(
+                    product.price || 0
+                  ).toLocaleString("en-IN")}
                 </p>
 
                 {/* RATING */}
 
                 <p className="mt-2 text-sm text-gray-600">
-                  ⭐ {product.rating}
+                  ⭐ {product.rating || 4.5}
                 </p>
 
                 {/* BUTTONS */}
@@ -619,12 +654,14 @@ export default function WishlistPage() {
                   {/* ADD TO CART */}
 
                   <button
+                    type="button"
                     onClick={() =>
                       addToCart(
-                        product.productUuid
+                        product.productUuid,
+                        product.variantUuid
                       )
                     }
-                    className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                    className="flex-1 cursor-pointer rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
                   >
                     Add to Cart
                   </button>
@@ -632,12 +669,14 @@ export default function WishlistPage() {
                   {/* REMOVE */}
 
                   <button
+                    type="button"
                     onClick={() =>
                       removeFromWishlist(
-                        product.productUuid
+                        product.productUuid,
+                        product.variantUuid
                       )
                     }
-                    className="flex-1 rounded-lg bg-red-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
+                    className="flex-1 cursor-pointer rounded-lg bg-red-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
                   >
                     Remove
                   </button>
@@ -647,26 +686,23 @@ export default function WishlistPage() {
                 {/* VIEW DETAILS */}
 
                 <button
+                  type="button"
                   onClick={() =>
                     router.push(
                       `/products/${product.productUuid}`
                     )
                   }
-                  className="mt-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                  className="mt-3 w-full cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
                 >
                   View Details
                 </button>
 
               </div>
-
             </div>
-
           ))}
 
         </div>
-
       </div>
-
     </div>
   );
 }

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 
 
 class ShippingAddress(BaseModel):
@@ -7,7 +7,7 @@ class ShippingAddress(BaseModel):
     line2: str = ""
     city: str
     state: str
-    pincode: str
+    pincode: str = Field(pattern=r"^[1-9][0-9]{5}$")
 
 
 class OrderCreate(BaseModel):

@@ -136,7 +136,7 @@ export default function ProfilePage() {
 
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="rounded-lg border border-red-500 px-4 py-2 font-medium text-red-500 hover:bg-red-500 hover:text-white"
+            className="rounded-lg border border-red-500 px-4 py-2 cursor-pointer font-medium text-red-500 hover:bg-red-500 hover:text-white"
           >
             Logout
           </button>
@@ -283,14 +283,14 @@ export default function ProfilePage() {
             <div className="mt-6 flex justify-center gap-4">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                className="rounded-lg border border-gray-300 px-5 py-2 text-sm cursor-pointer font-medium text-gray-700 hover:bg-gray-100"
               >
                 Cancel
               </button>
 
               <button
                 onClick={handleLogout}
-                className="rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white hover:bg-red-700"
+                className="rounded-lg bg-red-600 px-5 py-2 text-sm cursor-pointer font-medium text-white hover:bg-red-700"
               >
                 Yes
               </button>

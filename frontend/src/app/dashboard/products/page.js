@@ -2,18 +2,16 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
-import {
-  Search,
-  Plus,
-  Edit2,
-  Trash2,
-  X,
-  Package,
-  AlertCircle,
-  Check,
-} from "lucide-react";
+import {Search,Plus,Edit2,Trash2,X,Package,AlertCircle,Check,} from "lucide-react";
 
 export default function ProductsPage() {
+const capitalizeWords = (value) => {
+  return value
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -455,9 +453,12 @@ export default function ProductsPage() {
                     required
                     placeholder="e.g. Apple iPhone 15"
                     value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
+                  onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          title: capitalizeWords(e.target.value),
+                        })
+                      }
                     className={inputStyles}
                   />
                 </div>

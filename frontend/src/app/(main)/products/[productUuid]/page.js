@@ -189,6 +189,7 @@ export default function ProductDetails({ params }) {
         },
         body: JSON.stringify({
           productUuid: product.productUuid,
+          variantUuid: selectedVariant?.variantUuid || null,
         }),
       });
 
@@ -322,9 +323,9 @@ export default function ProductDetails({ params }) {
                         key={variant.variantUuid}
                         onClick={() => setSelectedVariant(variant)}
                         disabled={variant.stock === 0}
-                        className={`rounded-xl border px-4 py-2.5 text-left text-xs font-semibold transition ${
+                        className={`rounded-xl border px-4 py-2.5 text-left text-xs  cursor-pointer font-semibold transition ${
                           isSelected
-                            ? "border-blue-600 bg-blue-50/70 text-blue-700 shadow-xs ring-1 ring-blue-600"
+                            ? "border-blue-600 cursor-pointer bg-blue-50/70 text-blue-700 shadow-xs ring-1 ring-blue-600"
                             : "border-gray-200 bg-white text-gray-700 hover:border-blue-400"
                         } ${
                           variant.stock === 0
@@ -387,7 +388,7 @@ export default function ProductDetails({ params }) {
               <button
                 onClick={addToCart}
                 disabled={currentStock === 0 || isAddingCart}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xs transition hover:bg-blue-700 active:scale-98 disabled:cursor-not-allowed disabled:bg-gray-300"
+                className="flex flex-1 items-center justify-center cursor-pointer gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xs transition hover:bg-blue-700 active:scale-98 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
                 {isAddingCart ? (
                   <>
@@ -405,7 +406,7 @@ export default function ProductDetails({ params }) {
               <button
                 onClick={buyNow}
                 disabled={currentStock === 0}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-500 px-6 py-3.5 text-sm font-semibold text-white shadow-xs transition hover:bg-amber-600 active:scale-98 disabled:cursor-not-allowed disabled:bg-gray-300"
+                className="flex flex-1 items-center justify-center cursor-pointer gap-2 rounded-xl bg-amber-500 px-6 py-3.5 text-sm font-semibold text-white shadow-xs transition hover:bg-amber-600 active:scale-98 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
                 Buy Now
               </button>
@@ -416,7 +417,7 @@ export default function ProductDetails({ params }) {
               <button
                 onClick={addToWishlist}
                 disabled={isAddingWishlist}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-2xs transition hover:border-rose-300 hover:bg-rose-50/40 hover:text-rose-600 active:scale-98 disabled:opacity-50"
+                className="flex w-full items-center cursor-pointer justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-2xs transition hover:border-rose-300 hover:bg-rose-50/40 hover:text-rose-600 active:scale-98 disabled:opacity-50"
               >
                 {isAddingWishlist ? (
                   <>

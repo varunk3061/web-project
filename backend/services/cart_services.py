@@ -24,7 +24,7 @@ def add_to_cart(user_uuid, productUuid, variantUuid, quantity):
 
     selected_variant = None
 
-    if variantUuid:
+    if variantUuid:  #jar selected varient asle tar
 
         for variant in product.get("variants", []):
 
@@ -202,12 +202,7 @@ def add_to_cart(user_uuid, productUuid, variantUuid, quantity):
     }
 
 
-def update_cart_quantity(
-    user_uuid,
-    productUuid,
-    variantUuid,
-    quantity
-):
+def update_cart_quantity(user_uuid,productUuid,variantUuid,quantity):
 
     if quantity < 1:
 

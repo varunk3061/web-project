@@ -138,6 +138,13 @@ export default function CheckoutPage() {
       return;
     }
 
+
+      // Pincode validation
+      if (!/^\d{6}$/.test(shippingAddress.pincode)) {
+        setErrorMessage("Invalid pincode. Please enter a valid 6-digit pincode.");
+        return;
+      }
+
     const token = localStorage.getItem("token");
 
     try {
@@ -410,14 +417,14 @@ export default function CheckoutPage() {
             <div className="mt-6 flex flex-col gap-3">
               <button
                 onClick={() => router.push("/orders")}
-                className="w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-xs transition hover:bg-blue-700 active:scale-98"
+                className="w-full rounded-xl bg-blue-600 py-3 text-sm cursor-pointer font-bold text-white shadow-xs transition hover:bg-blue-700 active:scale-98"
               >
                 View My Orders
               </button>
 
               <button
                 onClick={() => router.push("/")}
-                className="w-full rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 active:scale-98"
+                className="w-full rounded-xl border border-gray-200 cursor-pointer py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 active:scale-98"
               >
                 Continue Shopping
               </button>

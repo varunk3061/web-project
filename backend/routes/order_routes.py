@@ -24,9 +24,7 @@ def place_order(order: OrderCreate,current_user=Depends(get_current_user)):
 
 
 @router.get("/orders")
-def read_orders(
-    current_user=Depends(get_current_user)
-):
+def read_orders(current_user=Depends(get_current_user)):
 
     user_uuid = current_user["userUuid"]
 
@@ -34,19 +32,13 @@ def read_orders(
 
 
 @router.get("/admin/orders")
-def read_all_orders(
-    current_admin=Depends(get_current_admin)
-):
+def read_all_orders(current_admin=Depends(get_current_admin)):
 
     return get_all_orders()
 
 
 @router.put("/admin/orders/{orderUuid}/status")
-def change_order_status(
-    orderUuid: str,
-    order_status: OrderStatusUpdate,
-    current_admin=Depends(get_current_admin)
-):
+def change_order_status(orderUuid: str,order_status: OrderStatusUpdate,current_admin=Depends(get_current_admin)):
 
     return update_order_status(
         orderUuid,

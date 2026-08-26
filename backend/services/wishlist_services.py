@@ -122,12 +122,10 @@ def get_wishlist(user_uuid):
     wishlist_collection = db["wishlists"]
     product_collection = db["products"]
 
-    # Find user's wishlist
     wishlist = wishlist_collection.find_one({
         "userUuid": user_uuid
     })
 
-    # Wishlist doesn't exist
     if wishlist is None:
         return {
             "items": []
@@ -135,45 +133,46 @@ def get_wishlist(user_uuid):
 
     wishlist_items = []
 
-    # Go through every wishlist item
     for item in wishlist["items"]:
 
-        # Find current product using UUID
         product = product_collection.find_one({
             "productUuid": item["productUuid"]
         })
 
         if product:
 
-            # --------------------------------
-            # DETERMINE DISPLAY PRICE
-            # --------------------------------
+            # -----------------------------
+            # FIND SELECTED VARIANT
+            # -----------------------------
 
-            variants = product.get("variants", [])
+            selected_variant = None
 
-            if variants:
+            variant_uuid = item.get("variantUuid")
 
-                # Get prices of all variants
-                prices = [
-                    variant["price"]
-                    for variant in variants
-                    if "price" in variant
-                ]
+            if variant_uuid:
 
-                # Lowest variant price
-                if prices:
-                    display_price = min(prices)
-                else:
-                    display_price = product["price"]
+                for variant in product.get("variants", []):
+
+                    if variant.get("variantUuid") == variant_uuid:
+
+                        selected_variant = variant
+                        break
+
+            # -----------------------------
+            # DETERMINE PRICE
+            # -----------------------------
+
+            if selected_variant:
+
+                display_price = selected_variant["price"]
 
             else:
 
-                # Product has no variants
                 display_price = product["price"]
 
-            # --------------------------------
-            # ADD PRODUCT TO WISHLIST RESPONSE
-            # --------------------------------
+            # -----------------------------
+            # ADD ITEM
+            # -----------------------------
 
             wishlist_items.append({
 
@@ -197,6 +196,7 @@ def get_wishlist(user_uuid):
             })
 
     return {
+
         "wishlistUuid":
             wishlist["wishlistUuid"],
 
@@ -204,26 +204,45 @@ def get_wishlist(user_uuid):
             wishlist_items
     }
 
-
-def remove_from_wishlist(user_uuid,productUuid,variantUuid=None):
+def remove_from_wishlist(
+    user_uuid,
+    productUuid,
+    variantUuid=None
+):
 
     wishlist_collection = db["wishlists"]
 
-    result = wishlist_collection.update_one(
+    if variantUuid is None:
 
-        {
-            "userUuid": user_uuid
-        },
-
-        {
-            "$pull": {
-                "items": {
-                    "productUuid": productUuid,
-                    "variantUuid": variantUuid
+        result = wishlist_collection.update_one(
+            {
+                "userUuid": user_uuid
+            },
+            {
+                "$pull": {
+                    "items": {
+                        "productUuid": productUuid,
+                        "variantUuid": None
+                    }
                 }
             }
-        }
-    )
+        )
+
+    else:
+
+        result = wishlist_collection.update_one(
+            {
+                "userUuid": user_uuid
+            },
+            {
+                "$pull": {
+                    "items": {
+                        "productUuid": productUuid,
+                        "variantUuid": variantUuid
+                    }
+                }
+            }
+        )
 
     if result.modified_count == 1:
 
@@ -234,3 +253,5 @@ def remove_from_wishlist(user_uuid,productUuid,variantUuid=None):
     return {
         "message": "Product not found in wishlist"
     }
+
+   
