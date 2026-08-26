@@ -192,7 +192,8 @@ export default function SearchPage() {
 
             <button
               onClick={() => router.push("/")}
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 active:scale-98"
+              className="mt-6 inline-flex items-center gap-2 cursor-pointer rounded-xl bg-blue-600 px-6 py-3 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 active:scale-98"
+              
             >
 
               <span>

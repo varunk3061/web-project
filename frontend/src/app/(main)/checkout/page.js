@@ -2,15 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  CheckCircle2,
-  AlertCircle,
-  X,
-  Loader2,
-  ShoppingBag,
-  ArrowRight,
-  ShieldCheck,
-} from "lucide-react";
+import {CheckCircle2,AlertCircle,X,Loader2} from "lucide-react";
 
 export default function CheckoutPage() {
   const router = useRouter();
