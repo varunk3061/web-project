@@ -1,5 +1,5 @@
 from fastapi import APIRouter,HTTPException,Depends
-from schemas.user_schema import User,UserLogin
+from schemas.user_schema import User, UserLogin, UserProfileUpdate, UserAddress
 from services.auth_services import register_user,login_user
 from dependencies.auth import get_current_user,get_current_admin
 
@@ -89,13 +89,93 @@ def profile(current_user=Depends(get_current_user)):
         "email": user["email"]
     }
 
+
 @router.get("/me")
 def get_me(current_user=Depends(get_current_user)):
+
+    user_collection = db["users"]
+
+    user = user_collection.find_one({
+        "userUuid": current_user["userUuid"]
+    })
+
+    if user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
     return {
-        "userUuid": current_user["userUuid"],
-        "email": current_user["email"],
-        "role": current_user["role"]
+        "userUuid": user["userUuid"],
+        "name": user["name"],
+        "email": user["email"],
+        "phone": user.get("phone"),
+        "address": user.get("address"),
+        "role": user["role"]
     }
+
+@router.put("/me")
+def update_profile(
+    profile: UserProfileUpdate,
+    current_user=Depends(get_current_user)
+):
+
+    user_collection = db["users"]
+
+    result = user_collection.update_one(
+        {
+            "userUuid": current_user["userUuid"]
+        },
+        {
+            "$set": {
+                "name": profile.name,
+                "phone": profile.phone
+            }
+        }
+    )
+
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return {
+        "message": "Profile updated successfully"
+    }
+
+
+@router.put("/me/address")
+def update_address(
+    address: UserAddress,
+    current_user=Depends(get_current_user)
+):
+
+    user_collection = db["users"]
+
+    result = user_collection.update_one(
+        {
+            "userUuid": current_user["userUuid"]
+        },
+        {
+            "$set": {
+                "address": address.model_dump()
+            }
+        }
+    )
+
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return {
+        "message": "Address saved successfully"
+    }
+
+
+
 
 @router.get("/admin-test")
 def admin_test(current_user=Depends(get_current_admin)): #Protected + role restricted — the user must be authenticated and have the required admin role.
