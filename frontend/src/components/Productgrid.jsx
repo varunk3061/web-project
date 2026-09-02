@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
-import Image from "next/image"
+
 
 
 export default function ProductGrid(){

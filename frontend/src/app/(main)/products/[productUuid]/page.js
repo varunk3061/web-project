@@ -298,7 +298,7 @@ export default function ProductDetails({ params }) {
               </span>
 
               <span className="text-xs font-medium text-gray-500">
-                {product.numReviews || 0} Ratings & Reviews
+                 Ratings & Reviews
               </span>
             </div>
 

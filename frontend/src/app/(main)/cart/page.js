@@ -397,7 +397,7 @@ export default function Cart() {
                           disabled={
                             item.quantity === 1
                           }
-                          className="flex h-9 w-9 items-center justify-center text-gray-600 transition hover:bg-white active:scale-95 disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-transparent"
+                          className="flex h-9 w-9 items-center cursor-pointer justify-center text-gray-600 transition hover:bg-white active:scale-95 disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-transparent"
                         >
                           <Minus size={15} />
                         </button>
@@ -420,7 +420,7 @@ export default function Cart() {
                               item.quantity + 1
                             )
                           }
-                          className="flex h-9 w-9 items-center justify-center text-gray-600 transition hover:bg-white active:scale-95"
+                          className="flex h-9 w-9 items-center cursor-pointer justify-center text-gray-600 transition hover:bg-white active:scale-95"
                         >
                           <Plus size={15} />
                         </button>
