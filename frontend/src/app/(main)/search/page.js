@@ -62,23 +62,7 @@ export default function SearchPage() {
             Home
           </Link>
 
-          {/* <ChevronRight
-            size={13}
-            className="text-gray-400"
-          /> */}
-
-          {/* {query && (
-            <>
-              <ChevronRight
-                size={13}
-                className="text-gray-400"
-              />
-
-              <span className="max-w-xs truncate font-semibold text-blue-600">
-                "{query}"
-              </span>
-            </>
-          )} */}
+         
 
         </nav>
 
@@ -112,9 +96,7 @@ export default function SearchPage() {
 
                   {filteredProducts.length}{" "}
 
-                  {filteredProducts.length === 1
-                    ? "Item"
-                    : "Items"}
+                  {filteredProducts.length === 1 ? "Item": "Items"}
 
                 </span>
               )}

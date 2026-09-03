@@ -7,6 +7,9 @@ from routes.order_routes import router as order_router
 from routes.wishlist_routes import router as wishlist_router
 from routes.catergory_routes import router as catergory_router
 from routes.dashboard_routes import router as dashboard_router
+from logging_config import configure_logging
+
+configure_logging()
 
 app = FastAPI()
 

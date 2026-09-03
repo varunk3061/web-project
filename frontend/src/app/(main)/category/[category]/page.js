@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
-import {
-  ChevronRight,
-  ArrowRight,
-  Package,
-} from "lucide-react";
+import {ChevronRight,ArrowRight,Package} from "lucide-react";
 
 export default function CategoryPage() {
   const params = useParams();
@@ -39,9 +35,7 @@ export default function CategoryPage() {
     }
   }, [category]);
 
-  const formattedCategoryName = category
-    ? category.charAt(0).toUpperCase() + category.slice(1)
-    : "Category";
+  const formattedCategoryName = category? category.charAt(0).toUpperCase() + category.slice(1): "Category";
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-16 pt-6">

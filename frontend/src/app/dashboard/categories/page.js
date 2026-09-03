@@ -244,7 +244,7 @@ export default function CategoriesPage() {
                 <Pencil size={18} className="text-blue-600" />
               </div>
 
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold cursor-pointer text-gray-900">
                 Edit Category
               </h2>
             </>
@@ -254,7 +254,7 @@ export default function CategoriesPage() {
                 <Plus size={18} className="text-blue-600" />
               </div>
 
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold cursor-pointer text-gray-900">
                 Add Category
               </h2>
             </>
@@ -282,7 +282,7 @@ export default function CategoriesPage() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-blue-600 px-6 py-3 cursor-pointer font-medium text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {saving
               ? "Saving..."
@@ -295,7 +295,7 @@ export default function CategoriesPage() {
             <button
               type="button"
               onClick={handleCancelEdit}
-              className="flex items-center justify-center gap-2 rounded-xl border border-gray-300 px-5 py-3 font-medium text-gray-600 transition hover:bg-gray-100"
+              className="flex items-center cursor-pointer justify-center gap-2 rounded-xl border border-gray-300 px-5 py-3 font-medium text-gray-600 transition hover:bg-gray-100"
             >
               <X size={18} />
               Cancel
@@ -390,7 +390,7 @@ export default function CategoriesPage() {
                           onClick={() =>
                             handleEdit(category)
                           }
-                          className="rounded-lg p-2 text-blue-600 transition hover:bg-blue-50"
+                          className="rounded-lg p-2 cursor-pointer text-blue-600 transition hover:bg-blue-50"
                           title="Edit"
                         >
                           <Pencil size={18} />
@@ -402,7 +402,7 @@ export default function CategoriesPage() {
                               category.categoryUuid
                             )
                           }
-                          className="rounded-lg p-2 text-red-600 transition hover:bg-red-50"
+                          className="rounded-lg p-2 cursor-pointer text-red-600 transition hover:bg-red-50"
                           title="Delete"
                         >
                           <Trash2 size={18} />

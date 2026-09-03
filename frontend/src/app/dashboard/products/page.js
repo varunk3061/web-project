@@ -262,7 +262,7 @@ const capitalizeWords = (value) => {
 
           <button
             onClick={openAddModal}
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-blue-700 active:scale-98"
+            className="inline-flex items-center gap-2 cursor-pointer rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-blue-700 active:scale-98"
           >
             <Plus size={18} />
             <span>Add Product</span>
@@ -397,7 +397,7 @@ const capitalizeWords = (value) => {
                         <div className="inline-flex items-center gap-2">
                           <button
                             onClick={() => openEditModal(product)}
-                            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-blue-600 shadow-2xs transition hover:bg-blue-50 active:scale-95"
+                            className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-blue-600 shadow-2xs transition hover:bg-blue-50 active:scale-95"
                           >
                             <Edit2 size={13} />
                             <span>Edit</span>
@@ -405,7 +405,7 @@ const capitalizeWords = (value) => {
 
                           <button
                             onClick={() => setProductToDelete(product)}
-                            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-rose-600 shadow-2xs transition hover:bg-rose-50 active:scale-95"
+                            className="inline-flex items-center cursor_pointer gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-rose-600 shadow-2xs transition hover:bg-rose-50 active:scale-95"
                           >
                             <Trash2 size={13} />
                             <span>Delete</span>
@@ -426,7 +426,7 @@ const capitalizeWords = (value) => {
       {/* ========================================================= */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
+          <div className="custom-scrollbar relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-gray-100 pb-4">
               <h2 className="text-xl font-bold text-gray-900">
@@ -434,7 +434,7 @@ const capitalizeWords = (value) => {
               </h2>
               <button
                 onClick={closeModal}
-                className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                className="rounded-full p-2 text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-600"
               >
                 <X size={20} />
               </button>
@@ -651,13 +651,13 @@ const capitalizeWords = (value) => {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="rounded-xl border border-gray-300 px-5 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                  className="rounded-xl border cursor-pointer border-gray-300 px-5 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-blue-700 active:scale-98"
+                  className="rounded-xl bg-blue-600 px-6 py-2.5 text-xs cursor-pointer font-semibold text-white shadow-xs hover:bg-blue-700 active:scale-98"
                 >
                   {editingProduct ? "Update Product" : "Create Product"}
                 </button>
@@ -673,11 +673,11 @@ const capitalizeWords = (value) => {
       {productToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
           <div className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+            <div className="mx-auto flex h-12 w-12 items-center cursor-pointer justify-center rounded-2xl bg-rose-50 text-rose-600">
               <Trash2 size={24} />
             </div>
 
-            <h3 className="mt-4 text-base font-bold text-gray-900">
+            <h3 className="mt-4 text-base cursor-pointer font-bold text-gray-900">
               Delete Product?
             </h3>
 
@@ -693,7 +693,7 @@ const capitalizeWords = (value) => {
               <button
                 disabled={isDeleting}
                 onClick={() => setProductToDelete(null)}
-                className="flex-1 rounded-xl border border-gray-300 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                className="flex-1 rounded-xl cursor-pointer border border-gray-300 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -701,7 +701,7 @@ const capitalizeWords = (value) => {
               <button
                 disabled={isDeleting}
                 onClick={handleConfirmDelete}
-                className="flex-1 rounded-xl bg-rose-600 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-rose-700 active:scale-98 disabled:opacity-50"
+                className="flex-1 rounded-xl bg-rose-600 py-2.5 cursor-pointer text-xs font-semibold text-white shadow-xs hover:bg-rose-700 active:scale-98 disabled:opacity-50"
               >
                 {isDeleting ? "Deleting..." : "Yes, Delete"}
               </button>

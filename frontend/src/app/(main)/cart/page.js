@@ -244,8 +244,7 @@ export default function Cart() {
 
           <p className="mt-1 text-gray-500">
             {totalItems}{" "}
-            {totalItems === 1
-              ? "item"
+            {totalItems === 1? "item"
               : "items"}{" "}
             in your cart
           </p>

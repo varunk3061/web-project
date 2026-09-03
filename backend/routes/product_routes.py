@@ -1,20 +1,21 @@
-from fastapi import APIRouter,Depends
-from schemas.product_schema import Product,ProductUpdate
-from services.product_service import create_product,get_products,get_product, update_product, delete_product
+from fastapi import APIRouter, Depends, HTTPException
+
+from schemas.product_schema import Product, ProductUpdate
+
+from services.product_service import (
+    create_product,
+    get_products,
+    get_product,
+    update_product,
+    delete_product
+)
+
 from dependencies.auth import get_current_admin
+
+from logging_config import log
 
 
 router = APIRouter()
-
-
-# @router.post("/products")
-# def add_product(product: Product):
-#     productUuid = create_product(product.model_dump())
-
-#     return {
-#         "message": "Product created successfully",
-#         "productUuid": productUuid
-#     }
 
 
 @router.post("/admin/products")
@@ -22,38 +23,132 @@ def add_product(
     product: Product,
     current_admin=Depends(get_current_admin)
 ):
-    productUuid = create_product(product.model_dump())
+    log.info(
+        "product_creation_attempt",
+        title=product.title,
+        category_uuid=product.categoryUuid
+    )
 
-    if productUuid is None:
+    try:
+        productUuid = create_product(
+            product.model_dump()
+        )
+
+        if productUuid is None:
+            log.warning(
+                "product_creation_failed",
+                title=product.title,
+                category_uuid=product.categoryUuid,
+                reason="category_not_found"
+            )
+
+            return {
+                "message": "Category not found"
+            }
+
+        log.info(
+            "product_created",
+            product_uuid=productUuid,
+            title=product.title,
+            category_uuid=product.categoryUuid
+        )
+
         return {
-            "message": "Category not found"
+            "message": "Product created successfully",
+            "productUuid": productUuid
         }
 
-    return {
-        "message": "Product created successfully",
-        "productUuid": productUuid
-    }
+    except HTTPException:
+        raise
 
-# @router.get("/products")
-# def read_products():
-#     products = get_products()l
-#     return products
+    except Exception:
+        log.exception(
+            "product_creation_error",
+            title=product.title,
+            category_uuid=product.categoryUuid
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to create product"
+        )
+
 
 @router.get("/products")
-def read_products(category: str = None): #categories wise sort karnaya sathi we uses category name from frontend
-    products = get_products(category)
-    return products
-    
+def read_products(category: str = None):
+
+    log.info(
+        "products_retrieval_attempt",
+        category=category
+    )
+
+    try:
+        products = get_products(category)
+
+        log.info(
+            "products_retrieved",
+            category=category
+        )
+
+        return products
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        log.exception(
+            "products_retrieval_error",
+            category=category
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to retrieve products"
+        )
+
+
 @router.get("/products/{productUuid}")
-def read_product(productUuid: str):  #finding the one product by it uuid
-    product = get_product(productUuid)
+def read_product(productUuid: str):
 
-    if product:
-        return product
+    log.info(
+        "product_retrieval_attempt",
+        product_uuid=productUuid
+    )
 
-    return {
-        "message": "Product not found"
-    }
+    try:
+        product = get_product(productUuid)
+
+        if product:
+            log.info(
+                "product_retrieved",
+                product_uuid=productUuid
+            )
+
+            return product
+
+        log.warning(
+            "product_not_found",
+            product_uuid=productUuid
+        )
+
+        return {
+            "message": "Product not found"
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        log.exception(
+            "product_retrieval_error",
+            product_uuid=productUuid
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to retrieve product"
+        )
+
 
 @router.put("/admin/products/{productUuid}")
 def update_product_route(
@@ -62,29 +157,77 @@ def update_product_route(
     current_admin=Depends(get_current_admin)
 ):
 
-    result = update_product(
-        productUuid,
-        product.model_dump(exclude_none=True) #why exclude_none means when the user only wants to update price then other fileds becomes none in pydantic model we use opitional for updatation
+    update_data = product.model_dump(
+        exclude_none=True
     )
 
-    if result is None:
+    log.info(
+        "product_update_attempt",
+        product_uuid=productUuid,
+        fields=list(update_data.keys())
+    )
+
+    try:
+        result = update_product(
+            productUuid,
+            update_data
+        )
+
+        if result is None:
+            log.warning(
+                "product_update_failed",
+                product_uuid=productUuid,
+                reason="category_not_found"
+            )
+
+            return {
+                "message": "Category not found"
+            }
+
+        if result.matched_count == 0:
+            log.warning(
+                "product_update_failed",
+                product_uuid=productUuid,
+                reason="product_not_found"
+            )
+
+            return {
+                "message": "Product not found"
+            }
+
+        if result.modified_count == 0:
+            log.info(
+                "product_update_no_changes",
+                product_uuid=productUuid
+            )
+
+            return {
+                "message": "No changes made"
+            }
+
+        log.info(
+            "product_updated",
+            product_uuid=productUuid,
+            fields=list(update_data.keys())
+        )
+
         return {
-            "message": "Category not found"
+            "message": "Product updated successfully"
         }
 
-    if result.matched_count == 0:
-        return {
-            "message": "Product not found"
-        }
+    except HTTPException:
+        raise
 
-    if result.modified_count == 0:
-        return {
-            "message": "No changes made"
-        }
+    except Exception:
+        log.exception(
+            "product_update_error",
+            product_uuid=productUuid
+        )
 
-    return {
-        "message": "Product updated successfully"
-    }
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to update product"
+        )
 
 
 @router.delete("/admin/products/{productUuid}")
@@ -93,15 +236,45 @@ def delete_product_route(
     current_admin=Depends(get_current_admin)
 ):
 
-    result = delete_product(productUuid)
+    log.info(
+        "product_deletion_attempt",
+        product_uuid=productUuid
+    )
 
-    if result.deleted_count == 1:
+    try:
+        result = delete_product(productUuid)
+
+        if result.deleted_count == 1:
+
+            log.info(
+                "product_deleted",
+                product_uuid=productUuid
+            )
+
+            return {
+                "message": "Product deleted successfully"
+            }
+
+        log.warning(
+            "product_deletion_failed",
+            product_uuid=productUuid,
+            reason="product_not_found"
+        )
+
         return {
-            "message": "Product deleted successfully"
+            "message": "Product not found"
         }
 
-    return {
-        "message": "Product not found"
-    }
+    except HTTPException:
+        raise
 
+    except Exception:
+        log.exception(
+            "product_deletion_error",
+            product_uuid=productUuid
+        )
 
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to delete product"
+        )

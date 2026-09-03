@@ -11,10 +11,7 @@ export default function Hero() {
       image: "/hero/kitchen.png",
       alt: "Kitchen products",
     },
-    {
-      image: "/hero/fashoin.png",
-      alt: "Fashion collection",
-    },
+   
     {
       image: "/hero/hero.png",
       alt: "Latest products",
@@ -76,6 +73,7 @@ export default function Hero() {
               )
             }
             className="
+              cursor-pointer
               absolute
               left-3
               top-1/2
@@ -108,6 +106,7 @@ export default function Hero() {
               )
             }
             className="
+              cursor-pointer
               absolute
               right-3
               top-1/2
