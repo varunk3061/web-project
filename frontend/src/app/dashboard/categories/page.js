@@ -11,6 +11,8 @@ export default function CategoriesPage() {
 
   const [editingCategory, setEditingCategory] = useState(null);
 
+ 
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -367,7 +369,7 @@ export default function CategoriesPage() {
                     <td className="px-6 py-4">
 
                       <div className="font-medium text-gray-900">
-                        {category.name}
+                        {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
                       </div>
 
                     </td>

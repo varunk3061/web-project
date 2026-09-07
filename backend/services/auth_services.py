@@ -29,6 +29,7 @@ def register_user(user_data):
 
     if len(password.encode("utf-8")) > 72:
         return None
+    
 
     # Hash password
     user_data["passwordHash"] = pwd_context.hash(password)
@@ -62,6 +63,7 @@ def login_user(user_data):
 
     if user is None:
         return None
+
 
     # Compare password
     password_match = pwd_context.verify(
